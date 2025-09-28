@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>To-Do List</h1>
+  <input type="text" id="taskInput" placeholder="Enter task">
+  <input type="text" id="dueDateInput" placeholder="Due date (string)">
+  <select id="priorityInput">
+    <option value="High">High</option>
+    <option value="Mid" selected>Mid</option>
+    <option value="Low">Low</option>
+  </select>
+  <button onclick="addTask()">Add Task</button>
+
+  <ul id="taskList"></ul>
+
+    <div id="snackbar"></div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
