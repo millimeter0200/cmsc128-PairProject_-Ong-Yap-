@@ -1,91 +1,78 @@
-let lastDeleted = null;
+let taskList = JSON.parse(localStorage.getItem('tasks')) || [];
 
-async function fetchTasks() {
-    const res = await fetch('/tasks');
-    const tasks = await res.json();
-    const list = document.getElementById('taskList');
-    list.innerHTML = '';
-    tasks.forEach(task => {
+function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(taskList));
+}
+
+function renderTasks() {
+    const ul = document.getElementById('taskList');
+    ul.innerHTML = '';
+
+    taskList.forEach((task, index) => {
         const li = document.createElement('li');
+
+        // ✅ Add priority classes
+        if (task.priority === "High") {
+            li.classList.add("priority-high");
+        } else if (task.priority === "Mid") {
+            li.classList.add("priority-mid");
+        } else if (task.priority === "Low") {
+            li.classList.add("priority-low");
+        }
+
+        if (task.done) {
+            li.classList.add("done");
+        }
+
         li.innerHTML = `
-            <span style="color:${task.priority === 'High' ? 'red' : task.priority === 'Low' ? 'green' : 'orange'}">
-              [${task.priority}]
-            </span>
-            <span style="${task.done ? 'text-decoration: line-through;' : ''}">${task.title}</span> (Due: ${task.due_date || "N/A"})
-            <button onclick="deleteTask(${task.id})">Delete</button>
-            <button onclick="markDone(${task.id}, ${task.done})">${task.done ? "Undo" : "Done"}</button>
+            <span>${task.text} - ${task.due} [${task.priority}]</span>
+            <div class="task-buttons">
+                <button onclick="toggleDone(${index})"><i class="fas fa-check"></i></button>
+                <button onclick="deleteTask(${index})"><i class="fas fa-trash-alt"></i></button>
+            </div>
         `;
-        list.appendChild(li);
+        ul.appendChild(li);
     });
 }
 
-async function addTask() {
-    const title = document.getElementById('taskInput').value;
-    const dueDate = document.getElementById('dueDateInput').value;
-    const priority = document.getElementById('priorityInput').value;
+function addTask() {
+    const textInput = document.getElementById('taskInput');
+    const dueInput = document.getElementById('dueDateInput');
+    const priorityInput = document.getElementById('priorityInput');
 
-    if (!title) {
-        showSnackbar('Please enter a task title', false);
-        return;
-    }
+    if (!textInput.value) return;
 
-    await fetch('/add', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({title, due_date: dueDate, priority})
+    taskList.push({
+        text: textInput.value,
+        due: dueInput.value,
+        priority: priorityInput.value,
+        done: false
     });
-    document.getElementById('taskInput').value = '';
-    document.getElementById('dueDateInput').value = '';
-    fetchTasks();
-    showSnackbar('You have successfully added a task', false);
+
+    textInput.value = '';
+    dueInput.value = '';
+    saveTasks();
+    renderTasks();
 }
 
-async function deleteTask(id) {
-    const res = await fetch(`/task/${id}`);
-    const task = await res.json();
-    lastDeleted = task;
-    await fetch(`/delete/${id}`, {method: 'DELETE'});
-    fetchTasks();
-    showSnackbar('Task deleted', true);
+function toggleDone(index) {
+    taskList[index].done = !taskList[index].done;
+    saveTasks();
+    renderTasks();
 }
 
-async function markDone(id, done) {
-    await fetch(`/update/${id}`, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({done: !done})
-    });
-    fetchTasks();
+function deleteTask(index) {
+    taskList.splice(index, 1);
+    saveTasks();
+    renderTasks();
+    showSnackbar('Task deleted');
 }
 
-function showSnackbar(message, withUndo) {
+function showSnackbar(message) {
     const snackbar = document.getElementById('snackbar');
-    snackbar.innerHTML = message;
-    if (withUndo) {
-        snackbar.innerHTML += `<span id="undo" onclick="undoDelete()">Undo</span>`;
-    }
+    snackbar.textContent = message;
     snackbar.className = 'show';
-    setTimeout(() => { 
-        snackbar.className = snackbar.className.replace('show', ''); 
-    }, 5000); // 5 seconds visibility
+    setTimeout(() => { snackbar.className = snackbar.className.replace('show', ''); }, 3000);
 }
 
-async function undoDelete() {
-    if (lastDeleted) {
-        await fetch('/add', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                title: lastDeleted.title,
-                due_date: lastDeleted.due_date,
-                priority: lastDeleted.priority
-            })
-        });
-        lastDeleted = null;
-        fetchTasks();
-        const snackbar = document.getElementById('snackbar');
-        snackbar.className = snackbar.className.replace('show', '');
-    }
-}
-
-fetchTasks();
+renderTasks();
