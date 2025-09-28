@@ -18,7 +18,7 @@ class Task(db.Model):
     done = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
-        # Convert stored timestamp (assumed UTC if naive) to Asia/Manila
+        # convert stored timestamp to Asia/Manila
         dt = self.date_added
         if dt is None:
             date_str = None
@@ -26,7 +26,7 @@ class Task(db.Model):
             # if naive datetime (no tzinfo), assume it's UTC (what we used before)
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=timezone.utc)
-            # Convert to Manila timezone
+            # convert to Manila timezone
             manila = dt.astimezone(ZoneInfo("Asia/Manila"))
             date_str = manila.strftime("%Y-%m-%d %H:%M")
         return {
@@ -38,11 +38,11 @@ class Task(db.Model):
             "done": self.done
         }
 
-# Create database
+# create database
 with app.app_context():
     db.create_all()
 
-# Routes
+# routes
 @app.route('/')
 def index():
     return render_template('index.html')
