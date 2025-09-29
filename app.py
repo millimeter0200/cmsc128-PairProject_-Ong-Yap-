@@ -28,11 +28,26 @@ class Task(db.Model):
                 dt = dt.replace(tzinfo=timezone.utc)
             # convert to Manila timezone
             manila = dt.astimezone(ZoneInfo("Asia/Manila"))
-            date_str = manila.strftime("%Y-%m-%d %H:%M")
+            date_str = manila.strftime("%m-%d-%Y %I:%M %p")
+
+        due_formatted = self.due_date
+        if self.due_date:
+            try:
+                # try parsing YYYY-MM-DD or YYYY-MM-DD HH:MM
+                if len(self.due_date.strip()) == 10:
+                    d = datetime.strptime(self.due_date, "%Y-%m-%d")
+                    due_formatted = d.strftime("%m-%d-%Y")
+                else:
+                    d = datetime.strptime(self.due_date, "%Y-%m-%d %H:%M")
+                    due_formatted = d.strftime("%m-%d-%Y %I:%M %p")
+
+            except:
+                pass  # leave as is if parsing fails
+    
         return {
             "id": self.id,
             "title": self.title,
-            "due_date": self.due_date,
+            "due_date": due_formatted,
             "priority": self.priority,
             "date_added": date_str,
             "done": self.done
