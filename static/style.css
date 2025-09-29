@@ -1,0 +1,194 @@
+/* Google Font */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.container {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 30px;
+    background: linear-gradient(135deg, #EDD5E5, #D1EDF8);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+/* Task input row */
+.task-input {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.task-input input, .task-input select, .task-input button {
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.task-input button {
+    background-color: #F4F9E4;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.task-input button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.sort-options {
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: #fff;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+li.done {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.task-info {
+    max-width: 75%;
+}
+
+/* Task meta */
+.task-meta small {
+    display: block;
+    color: #666;
+    margin-top: 6px;
+}
+
+/* Buttons */
+.task-buttons button {
+    margin-left: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.task-buttons button:hover {
+    color: #FF6B81;
+}
+
+/* Edit inputs inside task row */
+.edit-input {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.edit-datetime {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.edit-date, .edit-time, .edit-priority {
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Save / Cancel */
+.save-btn, .cancel-btn {
+    padding: 6px 10px;
+    margin-right: 6px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #f0f0f0;
+}
+
+/* Snackbar */
+#snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 12px 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    bottom: 30px;
+    font-size: 15px;
+}
+
+#snackbar.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 4.5s;
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+.undo-link {
+    color: #00ffff;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* Priority Styles (soft pastel colors) */
+.priority-high {
+    background-color: #F8C1C1; /* soft red-pink */
+}
+
+.priority-mid {
+    background-color: #FCE4B2; /* soft orange-yellow */
+}
+
+.priority-low {
+    background-color: #CDECC9; /* soft green */
+}
