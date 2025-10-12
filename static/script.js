@@ -9,6 +9,7 @@ function el(tag, className) {
     return e;
 }
 
+// loads tasks from backend, sorted by user selection
 async function fetchTasks() {
     const sortSelect = document.getElementById('sortSelect');
     const sort = sortSelect ? sortSelect.value : 'added';
@@ -18,6 +19,8 @@ async function fetchTasks() {
     renderTaskList(tasks);
 }
 
+// displays tasks in the UI with buttons(done, edit, delete)
+// updates the frontend task list
 function renderTaskList(tasks) {
     const ul = document.getElementById('taskList');
     ul.innerHTML = '';
@@ -36,6 +39,18 @@ function renderTaskList(tasks) {
         const titleSpan = el('span', 'task-title');
         titleSpan.textContent = task.title;
 
+        // Create checkbox to toggle done state
+        const checkbox = el('input', 'toggle-checkbox');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.done; // show check if already done
+        checkbox.title = 'Mark as done';
+
+        // When checkbox is clicked, toggle the task
+        checkbox.addEventListener('change', async () => {
+            await toggleDone(task.id, task.done);
+        });
+
+
         const meta = el('div', 'task-meta');
         const dueText = el('div');
         dueText.textContent = `Due: ${task.due_date || "N/A"}`;
@@ -45,17 +60,11 @@ function renderTaskList(tasks) {
         meta.appendChild(dueText);
         meta.appendChild(addedText);
 
+        info.appendChild(checkbox);
         info.appendChild(titleSpan);
         info.appendChild(meta);
 
         const buttons = el('div', 'task-buttons');
-
-        const doneBtn = el('button');
-        doneBtn.innerHTML = '<i class="fas fa-check"></i>';
-        doneBtn.title = 'Toggle done';
-        doneBtn.addEventListener('click', async () => {
-            await toggleDone(task.id, task.done);
-        });
 
         const editBtn = el('button');
         editBtn.innerHTML = '<i class="fas fa-edit"></i>';
@@ -67,7 +76,6 @@ function renderTaskList(tasks) {
         deleteBtn.title = 'Delete task';
         deleteBtn.addEventListener('click', () => deleteTask(task.id));
 
-        buttons.appendChild(doneBtn);
         buttons.appendChild(editBtn);
         buttons.appendChild(deleteBtn);
 
@@ -77,7 +85,7 @@ function renderTaskList(tasks) {
     });
 }
 
-// Add
+// sends new task to backend
 async function addTask() {
     const title = document.getElementById('taskInput').value.trim();
     const dueDate = document.getElementById('dueDateInput').value;
@@ -102,7 +110,7 @@ async function addTask() {
     fetchTasks();
 }
 
-// Toggle done
+// marks/unmarks task as done.
 async function toggleDone(id, done) {
     const res = await fetch(`/update/${id}`, {
         method: 'PUT',
@@ -113,7 +121,7 @@ async function toggleDone(id, done) {
     fetchTasks();
 }
 
-// Start inline edit - replaces info area with inputs
+// allows editing task title, due date/time, and priority
 function startEdit(li, task) {
     const info = li.querySelector('.task-info');
     info.innerHTML = ''; // clear current display
@@ -202,7 +210,7 @@ async function deleteTask(id) {
     showSnackbarWithUndo('Task deleted');
 }
 
-// Undo delete (recreate)
+// restores deleted task
 async function undoDelete() {
     if (!lastDeletedTask) return;
     await fetch('/add', {
@@ -220,7 +228,7 @@ async function undoDelete() {
     fetchTasks();
 }
 
-// Snackbar helpers
+// snackbar helpers: show success/error messages or undo option
 function showSnackbar(message) {
     const snackbar = document.getElementById('snackbar');
     snackbar.innerHTML = message;
@@ -237,7 +245,7 @@ function showSnackbarWithUndo(message) {
     setTimeout(() => { snackbar.className = snackbar.className.replace('show', ''); }, 5000);
 }
 
-// Event bindings
+// event bindings: runs code when DOM is ready (add button, sort dropdown, initial fetch)
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addBtn').addEventListener('click', addTask);
     document.getElementById('sortSelect').addEventListener('change', fetchTasks);
