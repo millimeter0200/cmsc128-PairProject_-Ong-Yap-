@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Accounts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+</head>
+<body>
+    <div class="container" style="max-width:800px;">
+        <h1>User Accounts</h1>
+
+        <div id="authArea">
+            <!-- Login box -->
+            <div style="margin-bottom:20px; padding:12px; border-radius:12px; background:#fff;">
+                <h3>Login/Sign up</h3>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <input id="loginUsername" placeholder="Username or email" style="flex:1;">
+                    <input id="loginPassword" type="password" placeholder="Password" style="flex:1;">
+                    <button id="loginBtn">Login</button>
+                    <button id="showRegisterBtn">Sign up</button>
+                </div>
+                <div style="margin-top:8px;">
+                    <a href="#" id="showForgot">Forgot password?</a>
+                </div>
+            </div>
+
+            <!-- Register box (hidden by default) -->
+            <div id="registerBox" style="display:none; margin-bottom:20px; padding:12px; border-radius:12px; background:#fff;">
+                <h3>Create account</h3>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <input id="regName" placeholder="Full name" style="flex:1;">
+                    <input id="regUsername" placeholder="Username or email" style="flex:1;">
+                    <input id="regPassword" type="password" placeholder="Password" style="flex:1;">
+                    <button id="registerBtn">Create account</button>
+                    <button id="hideRegisterBtn">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Forgot password box -->
+            <div id="forgotBox" style="display:none; margin-bottom:20px; padding:12px; border-radius:12px; background:#fff;">
+                <h3>Forgot password</h3>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <input id="forgotUsername" placeholder="Enter username or email" style="flex:1;">
+                    <button id="forgotBtn">Generate reset token</button>
+                    <button id="hideForgotBtn">Cancel</button>
+                </div>
+                <p style="font-size:0.9em; color:#666;">(Demo) The reset token will be shown on screen — in real apps you'd receive it by email.</p>
+                <pre id="forgotResult" style="display:none;background:#f5f5f5;padding:8px;border-radius:6px;"></pre>
+            </div>
+
+            <!-- Reset password -->
+            <div id="resetBox" style="display:none; margin-bottom:20px; padding:12px; border-radius:12px; background:#fff;">
+
+                <h3>Reset password (use token)</h3>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <input id="resetUsername" placeholder="Username/email" style="flex:1;">
+                    <input id="resetToken" placeholder="Token" style="flex:1;">
+                    <input id="resetNewpw" type="password" placeholder="New password" style="flex:1;">
+                    <button id="resetBtn">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile area (authenticated users) -->
+        <div id="profileArea" style="display:none; margin-top:10px; padding:14px; border-radius:12px; background:#fff;">
+            <h3>Your Account</h3>
+            <div>
+                <div><strong>Username:</strong> <span id="meUsername"></span></div>
+                <div><strong>Name:</strong> <span id="meName"></span></div>
+                <div style="margin-top:8px;">
+                    <input id="newName" placeholder="Change full name">
+                    <input id="newUsername" placeholder="Change username/email">
+                    <button id="saveProfileBtn">Save profile</button>
+                </div>
+
+                <hr style="margin:10px 0;">
+                <h4>Change password</h4>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <input id="currentPw" type="password" placeholder="Current password" style="flex:1;">
+                    <input id="newPw" type="password" placeholder="New password" style="flex:1;">
+                    <button id="changePwBtn">Change password</button>
+                </div>
+
+                <div style="margin-top:10px;">
+                    <button id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="accountsSnackbar" style="margin-top:12px; color:#333;"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='accounts.js') }}"></script>
+</body>
+</html>
