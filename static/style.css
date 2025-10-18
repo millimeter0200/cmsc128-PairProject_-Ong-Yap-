@@ -134,3 +134,133 @@ li.done {
 .priority-low {
     background-color: #CDECC9; /* soft green */
 }
+/* ===== core app styles (keeps old ToDo look) ===== */
+
+/* Google Font fallback */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* ---------------------------
+   Accounts / Auth page styling
+   --------------------------- */
+
+body.auth-page {
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 48px;
+  min-height: 100vh;
+}
+
+/* Page heading */
+.page-heading {
+  z-index:2;
+  margin:12px 0 12px;
+  font-size:2.2rem;
+  font-weight:800;
+  color:#000;
+  text-align:center;
+}
+
+/* Top alert */
+#topLoginAlert {
+  display: none;
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,230,230,0.96);
+  border: 1px solid rgba(200,30,30,0.22);
+  color: #7a0b0b;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  z-index: 1200;
+  min-width: 260px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* Shared pad style */
+.auth-pad {
+  z-index: 2;
+  width: 560px;
+  max-width: calc(100% - 40px);
+  padding: 22px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #000;
+  margin-bottom: 36px;
+}
+.pad-title { text-align:center; font-weight:800; font-size:1.15rem; margin:0 0 6px 0; }
+
+/* Input with icon */
+.auth-input {
+  display:flex; align-items:center; gap:12px;
+  background:rgba(250,250,250,0.98);
+  padding:12px; border-radius:12px; border:1px solid rgba(0,0,0,0.06);
+}
+.auth-input .fa { color: rgba(0,0,0,0.6); width:24px; text-align:center; }
+.auth-input input, .auth-input select {
+  border:none; background:transparent; outline:none; color:#000; width:100%; font-size:1rem; caret-color:#000;
+}
+.auth-input input::placeholder { color: rgba(0,0,0,0.5); }
+
+/* Actions row */
+.auth-actions { display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:6px; }
+
+/* Pastel gradient button - black text for contrast */
+.auth-button {
+  display:inline-block;
+  padding:12px;
+  border-radius:12px;
+  font-weight:800;
+  font-size:1rem;
+  color:#000;
+  border:none;
+  cursor:pointer;
+  background-image: linear-gradient(135deg, #FFE6EE 0%, #D1EDF8 50%, #EAD9FF 100%);
+  box-shadow: 0 8px 22px rgba(197,211,237,0.18);
+}
+.auth-button:hover { transform: translateY(-2px); }
+
+/* small link / muted text */
+.link-small { font-size:0.92rem; color:rgba(0,0,0,0.8); text-decoration:none; }
+.link-small a { color:inherit; font-weight:600; text-decoration:none; }
+.muted { color: rgba(0,0,0,0.66); font-size:0.95rem; }
+
+/* hide helper */
+.hidden { display:none !important; }
+
+/* Profile rows */
+#profileArea .profile-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+#profileArea input { padding:8px; border-radius:8px; border:1px solid #ddd; flex:1; }
+
+/* OTP display styling */
+#forgotOtpDisplay { background: #fff7f7; padding:8px; border-radius:8px; color:#7a0b0b; border:1px solid rgba(200,30,30,0.08); }
+
+/* small responsive */
+@media (max-width:640px) {
+  .auth-pad { width: calc(100% - 28px); padding:16px; }
+  .page-heading { font-size:1.6rem; }
+}
+
+/* Accessibility: visible focus */
+input:focus, select:focus, button:focus { outline: 3px solid rgba(197,211,237,0.25); outline-offset: 2px; }
+
+ul { list-style-type: none; padding: 0; }
+li { display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:#fff; border-radius:15px; margin-bottom:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); }
+li.done { text-decoration: line-through; opacity:0.6; }

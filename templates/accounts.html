@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Accounts — My To-Do List</title>
+
+  <!-- Fonts & icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* Basic page layout + background (use background.jpg) */
+    body.auth-page {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: url("{{ url_for('static', filename='background.jpg') }}") no-repeat center center fixed;
+      background-size: cover;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 48px;
+    }
+    .page-heading { z-index:2; margin:12px 0 12px; font-size:2.2rem; font-weight:800; color:#000; text-align:center;}
+
+    /* Top alert */
+    #topLoginAlert {
+      display: none;
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,230,230,0.96);
+      border: 1px solid rgba(200,30,30,0.22);
+      color: #7a0b0b;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      z-index: 1200;
+      min-width: 260px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    /* Shared pad style (applies to login / register / forgot / profile) */
+    .auth-pad {
+      z-index: 2;
+      width: 560px;
+      max-width: calc(100% - 40px);
+      padding: 22px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      color: #000;
+      margin-bottom: 36px;
+    }
+    .pad-title { text-align:center; font-weight:800; font-size:1.15rem; margin:0 0 6px 0; }
+
+    .auth-input { display:flex; align-items:center; gap:12px; background:rgba(250,250,250,0.98); padding:12px; border-radius:12px; border:1px solid rgba(0,0,0,0.06);}
+    .auth-input .fa { color: rgba(0,0,0,0.6); width:24px; text-align:center; }
+    .auth-input input, .auth-input select {
+      border:none; background:transparent; outline:none; color:#000; width:100%; font-size:1rem; caret-color:#000;
+    }
+    .auth-input input::placeholder { color: rgba(0,0,0,0.5); }
+
+    .auth-actions { display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:6px; }
+    .auth-button {
+      display:inline-block; padding:12px; border-radius:12px; font-weight:800; font-size:1rem;
+      color:#fff; border:none; cursor:pointer;
+      background-image: linear-gradient(135deg, #EDD5E5 0%, #D1EDF8 50%, #C5D3ED 100%);
+      box-shadow: 0 8px 22px rgba(197,211,237,0.25);
+    }
+    .auth-button:hover { transform: translateY(-2px); }
+
+    .link-small { font-size:0.92rem; color:rgba(0,0,0,0.8); text-decoration:none; }
+    .link-small a { color:inherit; font-weight:600; text-decoration:none; }
+    .muted { color: rgba(0,0,0,0.66); font-size:0.95rem; }
+
+    .hidden { display:none !important; }
+
+    /* profile box */
+    #profileArea .profile-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+    #profileArea input { padding:8px; border-radius:8px; border:1px solid #ddd; flex:1; }
+
+    @media (max-width:640px) {
+      .auth-pad { width: calc(100% - 28px); padding:16px; }
+      .page-heading { font-size:1.6rem; }
+    }
+  </style>
+</head>
+<body class="auth-page">
+  <h1 class="page-heading">My To-Do List</h1>
+  <div id="topLoginAlert" role="alert" aria-live="assertive"></div>
+
+  <div class="auth-pad" id="authPad">
+
+    <!-- LOGIN BOX -->
+    <div id="loginBox">
+      <div class="pad-title">Login</div>
+
+      <div class="auth-input">
+        <i class="fa fa-user"></i>
+        <input id="loginUsername" placeholder="Username or email" autocomplete="username" />
+      </div>
+
+      <div class="auth-input">
+        <i class="fa fa-lock"></i>
+        <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password" />
+      </div>
+
+      <div class="auth-actions" style="align-items:center;">
+        <div class="muted"><a href="#" id="showForgotLink" class="link-small">Forgot password?</a></div>
+        <button id="loginBtn" class="auth-button" type="button">Login</button>
+      </div>
+
+      <div class="muted" style="text-align:center;">Don't have an account? <a href="#" id="showRegisterLink">Sign Up</a></div>
+    </div>
+
+    <!-- REGISTER BOX (hidden by default) -->
+    <div id="registerBox" class="hidden">
+      <div class="pad-title">Create account</div>
+
+      <div class="auth-input"><i class="fa fa-id-card"></i><input id="regName" placeholder="Full name" autocomplete="name" /></div>
+      <div class="auth-input"><i class="fa fa-user"></i><input id="regUsername" placeholder="Username or email" autocomplete="username" /></div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="regPassword" type="password" placeholder="Password" autocomplete="new-password" /></div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="regPasswordConfirm" type="password" placeholder="Confirm password" autocomplete="new-password" /></div>
+
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="cancelRegister" class="link-small" type="button">Cancel</button>
+        <button id="registerBtn" class="auth-button" type="button">Create account</button>
+      </div>
+    </div>
+
+    <!-- FORGOT / SEND CODE BOX (hidden by default) -->
+<div id="forgotBox" class="hidden">
+  <div class="pad-title">Forgot password</div>
+  
+  <!-- STEP 1: username input -->
+  <div class="auth-input"><i class="fa fa-user"></i><input id="forgotUsername" placeholder="Username or email" autocomplete="username" /></div>
+  
+  <!-- STEP 2: OTP display (hidden initially) -->
+  <div id="forgotOtpDisplay" class="muted hidden" style="white-space:pre-wrap; margin-top:8px;"></div>
+  
+  <!-- STEP 2: OTP input box (hidden initially) -->
+  <div class="auth-input hidden" id="forgotOtpInput"><i class="fa fa-key"></i><input id="forgotCode" placeholder="Enter OTP" /></div>
+  
+  <!-- STEP 3: New password (hidden initially) -->
+  <div class="auth-input hidden" id="forgotNewPw"><i class="fa fa-lock"></i><input id="forgotNewPassword" type="password" placeholder="New password" /></div>
+
+  <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
+    <button id="cancelForgot" class="link-small" type="button">Cancel</button>
+    <button id="forgotBtn" class="auth-button" type="button" style="color:black;">Next</button>
+  </div>
+</div>
+
+
+    <!-- RESET BOX (hidden by default) -->
+    <div id="resetBox" class="hidden">
+      <div class="pad-title">Reset password (use code)</div>
+      <div class="auth-input"><i class="fa fa-user"></i><input id="resetUsername" placeholder="Username or email" /></div>
+      <div class="auth-input"><i class="fa fa-key"></i><input id="resetCode" placeholder="Code" /></div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="resetNewpw" type="password" placeholder="New password" /></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="cancelReset" class="link-small" type="button">Cancel</button>
+        <button id="resetBtn" class="auth-button" type="button">Reset</button>
+      </div>
+    </div>
+
+    <!-- PROFILE AREA (hidden by default / shown when logged in) -->
+    <div id="profileArea" class="hidden">
+      <div class="pad-title">Your Account</div>
+      <div class="profile-row"><strong style="width:120px;">Username:</strong><span id="meUsername" class="muted"></span></div>
+      <div class="profile-row"><strong style="width:120px;">Name:</strong><span id="meName" class="muted"></span></div>
+
+      <hr />
+
+      <div class="pad-title" style="font-size:1rem;">Account Settings</div>
+      <div class="profile-row"><input id="newName" placeholder="Change full name" /></div>
+      <div class="profile-row"><input id="newUsername" placeholder="Change username/email" /></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="saveProfileBtn" class="auth-button" type="button">Save profile</button>
+      </div>
+
+      <hr />
+      <div class="pad-title" style="font-size:1rem;">Change password</div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="currentPw" type="password" placeholder="Current password" /></div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="newPw" type="password" placeholder="New password" /></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="changePwBtn" class="auth-button" type="button">Change password</button>
+      </div>
+
+      <div style="display:flex; gap:8px; justify-content:flex-start; margin-top:8px;">
+        <button id="logoutBtn" class="link-small" type="button">Logout</button>
+      </div>
+    </div>
+
+  </div> <!-- auth-pad -->
+
+  <!-- load accounts.js -->
+  <script src="{{ url_for('static', filename='accounts.js') }}"></script>
+</body>
+</html>

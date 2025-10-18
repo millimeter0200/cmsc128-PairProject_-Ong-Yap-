@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from flask import Flask, render_template, request, jsonify      # Flask: framework for python, josnify: translater between PY and JS --converts data (dicts/lists) into JSON(communicate back&front)
+from flask_sqlalchemy import SQLAlchemy                         # SQLAlchemy: py lib helps talk to DB w/o queries (object rlational mapper-ORM)--treat DB tables like PY classes
+from datetime import datetime                                   #Flas SQLAlchemy connects sqlA and Flask (create DB, manage DB sessions, linking flas to DB)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
@@ -77,3 +77,11 @@ def delete_task(id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+    #front & backend communicate via JAVASCRIPT (sends Http with fetch ednpooints: accounts/login, accounts/register, accountforgot, acc/reset)-routes handled by flask backend
+    #acc.html opens browser (visible elements), acc.js(reads user input, sends requests to backend using fetch, recieves backend response, updates the UI
+    #app.py recievs http reuests from acc.js, talks to DB via SQLALch, makes/updates/query users, returns JSON responses with jsonify
+    #session commit does the saving to DB so that changes persist allows multiple users to have accounts, implemented using Flask sessions  
+    #session commit tracks changes made during session and saves to DB when commit is called
