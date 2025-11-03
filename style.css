@@ -1,0 +1,325 @@
+/* Google Font */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Main container */
+.container {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 30px;
+    background: linear-gradient(135deg, #EDD5E5, #D1EDF8);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+/* ---------------------------
+   Task input row & controls
+   --------------------------- */
+.task-input {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.task-input input, .task-input select, .task-input button {
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.task-input button {
+    background-color: #F4F9E4;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.task-input button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.sort-options {
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+/* ---------------------------
+   Task list & items
+   --------------------------- */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: #fff;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+li.done {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.task-info {
+    max-width: 75%;
+}
+
+/* Task meta (due date, priority, added) */
+.task-meta small {
+    display: block;
+    color: #666;
+    margin-top: 6px;
+}
+
+/* Buttons inside each task row */
+.task-buttons button {
+    margin-left: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.task-buttons button:hover {
+    color: #FF6B81;
+}
+
+/* Edit inputs inside task row */
+.edit-input {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.edit-datetime {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.edit-date, .edit-time, .edit-priority {
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Save / Cancel buttons */
+.save-btn, .cancel-btn {
+    padding: 6px 10px;
+    margin-right: 6px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #f0f0f0;
+}
+
+/* ---------------------------
+   Snackbar & Undo
+   --------------------------- */
+#snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: rgba(0,0,0,0.85);
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 12px 16px;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    bottom: 30px;
+    font-size: 15px;
+}
+
+#snackbar.show {
+    visibility: visible;
+    animation: fadein 0.5s;
+}
+
+/* persistent snackbar style (no auto-hide) */
+#snackbar.persistent { 
+    animation: none;
+}
+
+/* If we do want fadeout on standard snackbar */
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+.undo-link {
+    color: #00ffff;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* ---------------------------
+   Priority Styles (soft pastels)
+   --------------------------- */
+.priority-high {
+    background-color: #F8C1C1; /* soft red-pink */
+}
+
+.priority-mid {
+    background-color: #FCE4B2; /* soft orange-yellow */
+}
+
+.priority-low {
+    background-color: #CDECC9; /* soft green */
+}
+
+/* Slight tint for task body when priority applied (so text still readable) */
+li.priority-high { background-color: #FCE8E8; }
+li.priority-mid  { background-color: #FFF6E6; }
+li.priority-low  { background-color: #EEF8EE; }
+
+/* Toggle checkbox bigger */
+.toggle-checkbox {
+  transform: scale(1.3);
+  margin-right: 8px;
+  cursor: pointer;
+  accent-color: #4caf50; /* green checkbox color */
+}
+
+.done .task-title {
+  text-decoration: line-through;
+  color: gray;
+}
+
+/* ---------------------------
+   Accounts / Forms specific helpers
+   --------------------------- */
+
+/* Form row: label + input on one line; labels fixed width */
+.form-row { display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+.form-row label { width:170px; font-weight:600; color:#333; }
+.form-row input { flex:1; padding:8px 10px; border-radius:8px; border:1px solid #ddd; }
+
+/* Inline messages and small notes */
+.small-note { font-size:0.9em; color:#666; margin-top:8px; }
+.inline-error { color:crimson; margin-top:6px; font-size:0.95em; display:block; }
+.inline-success { color:green; margin-top:6px; font-size:0.95em; display:block; }
+
+/* Buttons for account UI */
+.small-btn { padding:6px 10px; border-radius:8px; border:none; cursor:pointer; background:#F4F9E4; }
+.small-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.06); }
+
+/* Dismiss 'x' link */
+.dismiss { margin-left:8px; cursor:pointer; color:#666; font-size:0.9em; }
+
+/* Code (OTP) display and controls */
+.code-box { display:flex; gap:8px; align-items:center; margin-top:8px; }
+.code-text { font-family: monospace; background:#f5f5f5; padding:8px 12px; border-radius:8px; }
+
+/* small utility */
+.hidden { display:none !important; }
+
+/* ---------------------------
+   Responsive tweaks
+   --------------------------- */
+@media (max-width: 640px) {
+    .container { margin: 20px; padding: 18px; }
+    .form-row { flex-direction: column; align-items: stretch; }
+    .form-row label { width: auto; }
+    .task-info { max-width: 100%; }
+}
+
+/* ---------------------------
+   Small accessibility touches
+   --------------------------- */
+/* Focus for keyboard users */
+input:focus, select:focus, button:focus { outline: 2px solid rgba(0,0,0,0.07); box-shadow: 0 0 0 3px rgba(197,211,237,0.35); }
+
+/* ===== small account page overrides (put at end of file) ===== */
+/* ===== Account page overrides (paste at END of static/style.css) ===== */
+
+/* Ensure account/login pages use readable black text */
+body.login-page { color: #000 !important; }
+
+/* Inputs inside the login pad should always be black text on light background */
+.login-pad .login-input input,
+.login-pad input#loginUsername,
+.login-pad input#loginPassword,
+.login-pad .login-input select {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  background: rgba(255,255,255,0.96) !important;
+}
+
+/* Make top alert clearly visible */
+#topLoginAlert { background: rgba(255,230,230,0.96) !important; color: #7a0b0b !important; }
+
+/* Keep the login pad separated and readable */
+.login-pad { background: rgba(255,255,255,0.96) !important; border-color: rgba(0,0,0,0.06) !important; }
+
+/* Pastel gradient button (also available as .auth-button in shared CSS) */
+.login-pad .login-button,
+.auth-button {
+  background-image: linear-gradient(135deg, #EDD5E5 0%, #D1EDF8 50%, #C5D3ED 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 8px 22px rgba(197,211,237,0.25) !important;
+  width: 100% !important;
+  padding: 12px !important;
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+}
+
+.login-black {
+  color: #000 !important;
+}
+
+
+/* Accessibility: focus outline for keyboard users */
+.login-pad .login-input input:focus, .login-pad .login-button:focus,
+.auth-button:focus {
+  outline: 3px solid rgba(197,211,237,0.22) !important;
+  outline-offset: 2px !important;
+}
+
+/* Small screens */
+@media (max-width: 640px) {
+  .login-pad { width: calc(100% - 32px) !important; padding: 18px !important; }
+  .login-pad .login-button { padding: 12px !important; border-radius: 10px !important; }
+}
