@@ -1,97 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>Accounts</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8" />
+  <title>Accounts — My To-Do List</title>
+
+  <!-- Fonts & icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body.auth-page {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: url("{{ url_for('static', filename='background.jpg') }}") no-repeat center center fixed;
+      background-size: cover;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 40px;
+    }
+
+    .lab2-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      color: #000;
+    }
+
+    #topLoginAlert {
+      display: none;
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,230,230,0.96);
+      border: 1px solid rgba(200,30,30,0.22);
+      color: #7a0b0b;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      z-index: 1200;
+      min-width: 260px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    .auth-pad {
+      z-index: 2;
+      width: 560px;
+      max-width: calc(100% - 40px);
+      padding: 22px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      color: #000;
+      /* transform: translate(-190px, 40px); */
+    }
+
+    .pad-title { text-align:center; font-weight:800; font-size:1.15rem; margin:0 0 6px 0; }
+
+    .auth-input { display:flex; align-items:center; gap:12px; background:rgba(250,250,250,0.98); padding:12px; border-radius:12px; border:1px solid rgba(0,0,0,0.06);}
+    .auth-input .fa { color: rgba(0,0,0,0.6); width:24px; text-align:center; }
+    .auth-input input { border:none; background:transparent; outline:none; color:#000; width:100%; font-size:1rem; caret-color:#000; }
+    .auth-input input::placeholder { color: rgba(0,0,0,0.5); }
+
+    .auth-button {
+      display:inline-block; padding:12px; border-radius:12px; font-weight:800; font-size:1rem;
+      color:#000000; border:none; cursor:pointer;
+      background-image: linear-gradient(135deg, #EDD5E5 0%, #D1EDF8 50%, #C5D3ED 100%);
+      box-shadow: 0 8px 22px rgba(197,211,237,0.25);
+    }
+
+    .auth-button:hover { transform: translateY(-2px); }
+
+    .link-small { font-size:0.92rem; color:rgba(0,0,0,0.8); text-decoration:none; }
+    .link-small a { color:inherit; font-weight:600; text-decoration:none; }
+    .muted { color: rgba(0,0,0,0.66); font-size:0.95rem; }
+
+    .hidden { display:none !important; }
+
+    #profileArea .profile-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+    #profileArea input { padding:8px; border-radius:8px; border:1px solid #ddd; flex:1; }
+
+    @media (max-width:640px) {
+      .auth-pad { width: calc(100% - 28px); padding:16px; }
+      .lab2-title { font-size:1.6rem; }
+    }
+  </style>
 </head>
-<body>
-    <div class="container" style="max-width:800px;">
-        <h1>User Accounts</h1>
 
-        <div id="authArea">
-            <!-- Login box -->
-            <div style="margin-bottom:20px; padding:12px; border-radius:12px; background:#fff;">
-                <h3>Login/Sign up</h3>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <input id="loginUsername" placeholder="Username or email" style="flex:1;">
-                    <input id="loginPassword" type="password" placeholder="Password" style="flex:1;">
-                    <button id="loginBtn">Login</button>
-                    <button id="showRegisterBtn">Sign up</button>
-                </div>
-                <div style="margin-top:8px;">
-                    <a href="#" id="showForgot">Forgot password?</a>
-                </div>
-            </div>
+<body class="auth-page">
+  <h1 class="lab2-title">My To-Do List</h1>
+  <div id="topLoginAlert" role="alert" aria-live="assertive"></div>
 
-            <!-- Register box (hidden by default) -->
-            <div id="registerBox" style="display:none; margin-bottom:20px; padding:12px; border-radius:12px; background:#fff;">
-                <h3>Create account</h3>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <input id="regName" placeholder="Full name" style="flex:1;">
-                    <input id="regUsername" placeholder="Username or email" style="flex:1;">
-                    <input id="regPassword" type="password" placeholder="Password" style="flex:1;">
-                    <button id="registerBtn">Create account</button>
-                    <button id="hideRegisterBtn">Cancel</button>
-                </div>
-            </div>
+  <div class="auth-pad" id="authPad">
 
-            <!-- Forgot password box -->
-            <div id="forgotBox" style="display:none; margin-bottom:20px; padding:12px; border-radius:12px; background:#fff;">
-                <h3>Forgot password</h3>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <input id="forgotUsername" placeholder="Enter username or email" style="flex:1;">
-                    <button id="forgotBtn">Generate reset token</button>
-                    <button id="hideForgotBtn">Cancel</button>
-                </div>
-                <p style="font-size:0.9em; color:#666;">(Demo) The reset token will be shown on screen — in real apps you'd receive it by email.</p>
-                <pre id="forgotResult" style="display:none;background:#f5f5f5;padding:8px;border-radius:6px;"></pre>
-            </div>
-
-            <!-- Reset password -->
-            <div id="resetBox" style="display:none; margin-bottom:20px; padding:12px; border-radius:12px; background:#fff;">
-
-                <h3>Reset password (use token)</h3>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <input id="resetUsername" placeholder="Username/email" style="flex:1;">
-                    <input id="resetToken" placeholder="Token" style="flex:1;">
-                    <input id="resetNewpw" type="password" placeholder="New password" style="flex:1;">
-                    <button id="resetBtn">Reset</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Profile area (authenticated users) -->
-        <div id="profileArea" style="display:none; margin-top:10px; padding:14px; border-radius:12px; background:#fff;">
-            <h3>Your Account</h3>
-            <div>
-                <div><strong>Username:</strong> <span id="meUsername"></span></div>
-                <div><strong>Name:</strong> <span id="meName"></span></div>
-                <div style="margin-top:8px;">
-                    <input id="newName" placeholder="Change full name">
-                    <input id="newUsername" placeholder="Change username/email">
-                    <button id="saveProfileBtn">Save profile</button>
-                </div>
-
-                <hr style="margin:10px 0;">
-                <h4>Change password</h4>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <input id="currentPw" type="password" placeholder="Current password" style="flex:1;">
-                    <input id="newPw" type="password" placeholder="New password" style="flex:1;">
-                    <button id="changePwBtn">Change password</button>
-                </div>
-
-                <div style="margin-top:10px;">
-                    <button id="logoutBtn">Logout</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="accountsSnackbar" style="margin-top:12px; color:#333;"></div>
+    <!-- LOGIN -->
+    <div id="loginBox">
+      <div class="pad-title">Login</div>
+      <div class="auth-input"><i class="fa fa-user"></i><input id="loginUsername" placeholder="Username or email" /></div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="loginPassword" type="password" placeholder="Password" /></div>
+      <div class="auth-actions" style="display:flex; justify-content:space-between; align-items:center;">
+        <a href="#" id="showForgotLink" class="link-small">Forgot password?</a>
+        <button id="loginBtn" class="auth-button login-black" type="button">Login</button>
+      </div>
+      <div class="muted" style="text-align:center;">Don’t have an account? <a href="#" id="showRegisterLink">Sign Up</a></div>
     </div>
 
-    <script src="{{ url_for('static', filename='accounts.js') }}"></script>
+    <!-- REGISTER -->
+    <div id="registerBox" class="hidden">
+      <div class="pad-title">Create account</div>
+      <div class="auth-input"><i class="fa fa-id-card"></i><input id="regName" placeholder="Full name" /></div>
+      <div class="auth-input"><i class="fa fa-user"></i><input id="regUsername" placeholder="Username or email" /></div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="regPassword" type="password" placeholder="Password" /></div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="regPasswordConfirm" type="password" placeholder="Confirm password" /></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="cancelRegister" class="link-small" type="button">Cancel</button>
+        <button id="registerBtn" class="auth-button" type="button">Create account</button>
+      </div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="forgotBox" class="hidden">
+      <div class="pad-title">Forgot password</div>
+      <div class="auth-input"><i class="fa fa-user"></i><input id="forgotUsername" placeholder="Username or email" /></div>
+
+      <div id="forgotOtpDisplay" class="muted hidden" style="margin-top:8px;"></div>
+
+      <div class="auth-input hidden" id="forgotOtpInput"><i class="fa fa-key"></i><input id="forgotCode" placeholder="Enter reset code" /></div>
+      <div class="auth-input hidden" id="forgotNewPw"><i class="fa fa-lock"></i><input id="forgotNewPassword" type="password" placeholder="New password" /></div>
+
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
+        <button id="cancelForgot" class="link-small" type="button">Cancel</button>
+        <button id="forgotBtn" class="auth-button" type="button" style="color:black;">Next</button>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="profileArea" class="hidden">
+      <div class="pad-title">Your Account</div>
+      <div class="profile-row"><strong>Username:</strong><span id="meUsername" class="muted"></span></div>
+      <div class="profile-row"><strong>Name:</strong><span id="meName" class="muted"></span></div>
+      <hr />
+      <div class="pad-title" style="font-size:1rem;">Account Settings</div>
+      <div class="profile-row"><input id="newName" placeholder="Change full name" /></div>
+      <div class="profile-row"><input id="newUsername" placeholder="Change username/email" /></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="saveProfileBtn" class="auth-button" type="button">Save profile</button>
+      </div>
+      <hr />
+      <div class="pad-title" style="font-size:1rem;">Change password</div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="currentPw" type="password" placeholder="Current password" /></div>
+      <div class="auth-input"><i class="fa fa-lock"></i><input id="newPw" type="password" placeholder="New password" /></div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="changePwBtn" class="auth-button" type="button">Change password</button>
+      </div>
+      <div style="display:flex; gap:8px; justify-content:flex-start; margin-top:8px;">
+        <button id="logoutBtn" class="link-small" type="button">Logout</button>
+      </div>
+    </div>
+
+  </div>
+  <script src="{{ url_for('static', filename='accounts.js') }}"></script>
 </body>
 </html>
