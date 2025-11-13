@@ -4,6 +4,7 @@ from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 from werkzeug.security import generate_password_hash, check_password_hash
 import random, string
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
@@ -11,6 +12,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'dev-secret-key-change-me'
 
 db = SQLAlchemy(app)
+
+# Flask-Mail config
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'      # your SMTP server
+app.config['MAIL_PORT'] = 587                     # TLS port
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'yapmaemaricar@gmail.com'  # sender email
+app.config['MAIL_PASSWORD'] = 'varq vhhx lrfb rhut'     # app password
+app.config['MAIL_DEFAULT_SENDER'] = ('My ToDo App', 'your_email@gmail.com')
+
+mail = Mail(app)
 
 # ---------------- TASK MODEL ----------------
 class Task(db.Model):
@@ -82,12 +94,18 @@ with app.app_context():
 
 # ---------------- ROUTES ----------------
 @app.route('/')
-def index():
-    return render_template('index.html')
+def welcome():
+    if session.get('user_id'):
+        return render_template('index.html')  # already logged in
+    return render_template('welcome.html')
+
 
 @app.route('/accounts')
 def accounts_page():
+    if session.get('user_id'):
+        return render_template('accounts.html')  # already logged in
     return render_template('accounts.html')
+
 
 # ---------- AUTH HELPERS ----------
 def get_current_user():
@@ -179,22 +197,30 @@ def accounts_forgot():
     if not user:
         return jsonify({"error": "No such account"}), 404
 
-    # Short, user-friendly OTP (letters + numbers)
+    # Short token (letters + numbers)
     import random, string
     token = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
-
     expiry = datetime.utcnow() + timedelta(minutes=20)
     user.reset_token = token
     user.reset_token_expiry = expiry
     db.session.commit()
 
-    # Simulate "sending email" by printing to server console
-    print(f"\n📧 [SIMULATED EMAIL] Password reset code for '{username}': {token}\n")
+    # Send email
+    try:
+        msg = Message(
+            subject="Password Reset Code",
+            recipients=[user.username],  # assuming username is the email
+            body=f"Hello {user.name},\n\nYour password reset code is: {token}\nThis code will expire in 20 minutes."
+        )
+        mail.send(msg)
+    except Exception as e:
+        print("Failed to send email:", e)
+        return jsonify({"error": "Failed to send email"}), 500
 
-    # Respond vaguely (so it looks realistic)
     return jsonify({
-        "message": "A password reset code has been sent to your registered email. (Check console for demo.)"
+        "message": "A password reset code has been sent to your email."
     })
+
 
 
 # ---------- RESET PASSWORD ----------
@@ -325,7 +351,15 @@ def delete_task(id):
     db.session.commit()
     return jsonify({"message": "Task deleted"})
 
+@app.route('/todo')
+def todo_page():
+    if not session.get('user_id'):
+        return render_template('accounts.html')
+    return render_template('index.html')
+
+@app.route('/collab')
+def collab():
+    return render_template('collab.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
-
