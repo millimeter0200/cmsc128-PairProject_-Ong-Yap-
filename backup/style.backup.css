@@ -3,24 +3,24 @@ body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background: url('bg.jpg') no-repeat center center fixed;
+    background: url('background.jpg') no-repeat center center fixed;
     background-size: cover;
 }
 
 /* Main container */
 .container {
-    max-width: 1500px;
+    max-width: 700px;
+    margin: 50px auto;
     padding: 30px;
-    margin-left: -95px;
-    
+    background: linear-gradient(135deg, #EDD5E5, #D1EDF8);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
 h1 {
-    position: relative;
-    top: 65px; /* moves only the text down */
-    margin-bottom: 20px; /* spacing below heading */
-    margin-left: 650px;
-
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
 }
 
 /* ---------------------------
@@ -32,7 +32,6 @@ h1 {
     justify-content: space-between;
     gap: 10px;
     margin-bottom: 20px;
-    margin-left: -90px;
 }
 
 .task-input input, .task-input select, .task-input button {
@@ -210,9 +209,9 @@ li.done {
 }
 
 /* Slight tint for task body when priority applied (so text still readable) */
-li.priority-high { background-color: #fadade; }
-li.priority-mid  { background-color: #CBE6EE; }
-li.priority-low  { background-color: #FFF8BF; }
+li.priority-high { background-color: #FCE8E8; }
+li.priority-mid  { background-color: #FFF6E6; }
+li.priority-low  { background-color: #EEF8EE; }
 
 /* Toggle checkbox bigger */
 .toggle-checkbox {
@@ -324,214 +323,3 @@ body.login-page { color: #000 !important; }
   .login-pad { width: calc(100% - 32px) !important; padding: 18px !important; }
   .login-pad .login-button { padding: 12px !important; border-radius: 10px !important; }
 }
-
-/* greeting and date*/
-#userGreeting {
-  position: absolute;
-  top: 40px;
-  left: 40%;
-  transform: translateX(35%); 
-  text-align: left;
-}
-
-#greetName {
-  font-weight: 700;
-  font-size: 2rem !important;
-}
-
-#greetDate {
-  font-size: 0.95rem;
-  color: rgba(0, 0, 0, 0.7);
-}
-
-
-/* two-column layout for tasks */
-.tasks-wrapper {
-    display: flex;
-    gap: 10px; /* space between columns */
-    margin-top: 20px;
-}
-
-/* left column: add task*/
-.tasks-left {
-    flex: 1; /* smaller width */
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-left: 200px;
-    margin-top: 60px;
-}
-
-/* right column: task list */
-.tasks-right {
-    flex: 2; /* bigger width */
-    margin-top: 20px;
-}
-
-/* scrollable task list if too long */
-.tasks-right ul {
-    max-height: 450px;
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-.new-todo-label {
-    font-weight: 600;
-    font-size: 2rem;
-    margin-bottom: 10px;
-    margin-left: 30px;
-    color: #333;
-}
-
-.add-task-container {
-    background: linear-gradient(135deg, #EDD5E5, #D1EDF8); /* pastel gradient like your main container */
-    padding: 100px;
-    border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    height: 300px;
-}
-
-
-/* responsive: stack columns on small screens */
-@media (max-width: 768px) {
-    .tasks-wrapper {
-        flex-direction: column;
-    }
-}
-
-.tasks-right .sort-options select {
-    padding: 5px 12px;         /* space inside the dropdown */
-    border-radius: 8px;        /* rounded corners */
-    border: 1px solid #ccc;    /* light border */
-    background-color: #fdfdfd; /* background color of dropdown */
-    font-size: 0.95rem;        /* text size */
-    color: #333;               /* text color */
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-top: -1px;
-    z-index: 10; /* bring it above other elements */
-
-}
-
-/* Hover effect for the select box */
-.tasks-right .sort-options select:hover {
-    border-color: #888;
-    background-color: #f5f5f5;
-}
-
-/* Style the options inside the dropdown (limited styling) */
-.tasks-right .sort-options select option {
-    padding: 6px 10px; /* space inside each option */
-    background-color: #fff;
-    color: #333;
-}
-
-/* Optional: make the dropdown a bit wider */
-.tasks-right .sort-options {
-    display: inline-block; /* so width can adjust */
-}
-
-.tasks-right .sort-options {
-    display: flex;
-    justify-content: right; /* keeps it on the right */
-    gap: 8px; /* space between label and select */
-    margin-bottom: 10px;
-    margin-top: -10px;
-}
-
-/* Header actions container */
-.header-actions {
-    text-align: right;       /* moves the button to the right */
-    margin-right: 110px;
-    margin-top: 40px;
-    margin-bottom: -60px;
-}
-
-/* Accounts button styling */
-#accountsLink.button {
-    padding: 8px 16px;
-    border-radius: 12px;
-    color: #000;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;               
-    transition: all 0.3s ease;
-    margin-right: 10px;
-    margin-top: 5px;
-}
-
-
-.add-task-container {
-    background: none;
-    box-shadow: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-}
-
-/* New Add Task Form Layout */
-.add-task-container {
-  padding: 20px;
-  width: 100%;
-  max-width: 280px; /* adjust if needed */
-  margin-left: -20px;
-  margin-top: -30px;
-}
-
-.add-task-container h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 15px;
-  font-weight: 700;
-}
-
-/* Arrange inputs vertically */
-.task-form {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.task-form label {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 2px;
-  font-size: 0.9rem;
-}
-
-/* Style input boxes and dropdown */
-.task-form input,
-.task-form select {
-  padding: 8px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  background-color: #fff;
-}
-
-/* Style the Add button */
-#addBtn {
-  background-color: #ffffff;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-  border: none;
-  border-radius: 10px;
-  padding: 10px;
-  width: 100px;
-  margin-top: 10px;
-  margin-left: 180px;
-}
-
-#addBtn:hover {
-  background-color: #faa0e3; /* slightly darker green */
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
