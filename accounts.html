@@ -24,15 +24,13 @@
     }
 
     .container {
-      position: fixed;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255,255,255,0.95);
       border-radius: 16px;
       padding: 24px;
-      width: 500px;
+      width: 495px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       text-align: center;
-      margin-top: 128px;
-      margin-left: 0px;
+      margin-top: 150px;
     }
 
     .profile-pic {
@@ -41,24 +39,21 @@
       border-radius: 50%;
       background: #eee url("https://cdn-icons-png.flaticon.com/512/847/847969.png") center/cover no-repeat;
       margin: 0 auto 16px;
-      margin-left: 20px;
-      margin-top: -10px;
     }
 
-    /*username and name*/
     .info {
       margin-bottom: 16px;
+      background: rgba(255,255,255,0.6);
       padding: 12px;
       border-radius: 10px;
       text-align: left;
-      margin-left: 150px;
-      margin-top: -115px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
     .info p {
       margin: 8px 0;
-      font-size: 1.2rem;
-      color: #000000;
+      font-size: 1rem;
+      color: #333;
     }
 
     .info strong {
@@ -72,39 +67,34 @@
     }
 
     .btn {
+      background-image: linear-gradient(135deg, #EDD5E5 0%, #D1EDF8 50%, #C5D3ED 100%);
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 10px 16px;
       font-weight: 600;
       cursor: pointer;
       transition: 0.2s;
     }
-    
+
     .btn:hover { transform: translateY(-2px); }
     .hidden { display: none; }
 
     #changePasswordFields input {
       display: block;
-      width: 50%;
+      width: 100%;
       padding: 8px;
+      margin: 6px 0;
       border-radius: 8px;
       border: 1px solid #ccc;
-      margin-left: 20px;
-      margin-top: 20px;
-      margin-bottom: 12px;
     }
 
-   .actions {
-      display: flex;          /* makes children flex items */
-      flex-direction: row;    /* default, ensures horizontal alignment */
-      justify-content: flex-start; /* aligns items to the start (left) */
-      align-items: center;    /* vertically centers the buttons */
-      gap: 8px;               /* space between buttons */
-      margin-top: 16px;       /* space above the row */
-      flex-wrap: wrap;        /* allows wrapping to next line if screen is too small */
-      margin-left: 260px;
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
-
 
     #topLoginAlert {
       display: none;
@@ -116,13 +106,6 @@
 </head>
 
 <body class="accounts-page">
-
-  <button id="backToTasksBtn" 
-        style="background-color:transparent; color:rgb(0, 0, 0); border:none; font-weight:600; font-size: 1.2rem; cursor:pointer; position:fixed; top:50px; right:145px;">
-    ◀ Back 
-  </button>
-
-  <button id="collabTDLBtn" class="small-btn">Collaborative To-Do List</button>
 
   <div class="container">
     <div id="topLoginAlert"></div>
@@ -156,6 +139,7 @@
 
     <!-- PROFILE AREA -->
     <div id="profileArea" class="hidden">
+      <h3>My Account</h3>
       <div class="profile-pic"></div>
 
       <div class="info">
@@ -163,13 +147,17 @@
         <p><strong>Name:</strong> <span id="meName"></span></p>
       </div>
 
-      <div class="actions profile-actions">
+      <div class="actions">
         <button id="editProfileBtn" class="btn">Edit Profile</button>
         <button id="saveProfileBtn" class="btn hidden">Save</button>
         <button id="cancelEditBtn" class="btn hidden">Cancel</button>
-        <button id="changePasswordBtn" class="btn">Change Password</button>
       </div>
 
+      <div class="actions">
+        <button id="changePasswordBtn" class="btn">Change Password</button>
+        <button id="backToTasksBtn" class="btn">Back to To-Do List</button>
+        <button id="logoutBtn" class="btn">Logout</button>
+      </div>
 
       <div id="changePasswordFields" class="hidden">
         <input id="currentPassword" type="password" placeholder="Current password" />
@@ -177,10 +165,6 @@
         <button id="savePasswordBtn" class="btn">Save Password</button>
         <button id="cancelPasswordBtn" class="btn">Cancel</button>
       </div>
-    </div>
-
-    <div class="actions account-actions">
-        <button id="logoutBtn" class="btn">Logout</button>
     </div>
 
     <!-- FORGOT PASSWORD -->
@@ -226,17 +210,6 @@
       </div>
       <a href="#" onclick="showLogin()">Back to Login</a>
     </div>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const collabBtn = document.getElementById('collabTDLBtn');
-        if (collabBtn) {
-          collabBtn.addEventListener('click', () => {
-            window.location.href = "{{ url_for('collab') }}";
-          });
-        }
-      });
-    </script>
 
 
   <script src="{{ url_for('static', filename='accounts.js') }}"></script>

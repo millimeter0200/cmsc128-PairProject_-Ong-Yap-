@@ -357,9 +357,6 @@ def todo_page():
         return render_template('accounts.html')
     return render_template('index.html')
 
-@app.route('/collab')
-def collab():
-    return render_template('collab.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

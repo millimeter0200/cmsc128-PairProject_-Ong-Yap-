@@ -269,16 +269,9 @@ function bind() {
   });
 }
 
-
-
 /* --- INIT --- */
 document.addEventListener('DOMContentLoaded', async () => {
   bind();
   const loggedIn = await refreshProfile();
   if (!loggedIn) showLogin();
-});
-
-// JS to navigate to collab page
-document.getElementById('collabTDLBtn').addEventListener('click', () => {
-    window.location.href = 'collab.html';
 });
