@@ -251,13 +251,3 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sortSelect').addEventListener('change', fetchTasks);
     fetchTasks();
 });
-
-// --- ACCOUNT BUTTON ---
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('profileBtn');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      window.location.href = '/accounts'; 
-    });
-  }
-});

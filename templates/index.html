@@ -11,44 +11,94 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div id="userGreeting" style="position: absolute; top: 20px; left: 20px; text-align: left;">
+        <div id="greetName" style="font-weight: 700; font-size: 1.2rem;">Hello!</div>
+        <div id="greetDate" style="font-size: 0.95rem; color: rgba(0,0,0,0.7);"></div>
+    </div>
+
+    <div class="header-actions">
+        <a href="/accounts" id="accountsLink" class="button">
+            <i class="fa fa-user"></i> Accounts
+        </a>
+    </div>
+
     <div class="container">
         <h1>My To-Do List</h1>
-        <div class="nav-bar" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-            <button id="profileBtn" style="
-                background: #f3f3f3;
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                padding: 6px 12px;
-                font-weight: 600;
-                cursor: pointer;
-            ">Account</button>
-        </div>
-        <div class="task-input">
-            <input type="text" id="taskInput" placeholder="Enter task">
-            <input type="date" id="dueDateInput">
-            <input type="time" id="dueTimeInput">
-            <select id="priorityInput">
-                <option value="High">High</option>
-                <option value="Mid" selected>Mid</option>
-                <option value="Low">Low</option>
-            </select>
-            <button id="addBtn"><i class="fas fa-plus"></i> Add</button>
+
+        <div class="tasks-wrapper">
+            <!-- Left column: add task -->
+            <div class="tasks-left">
+                <div class="add-task-container">
+                    <div class="new-todo-label">New To-Do</div>
+
+                    <div class="task-form">
+                        <label for="taskInput">Enter task</label>
+                        <input type="text" id="taskInput" placeholder="Type your task here">
+
+                        <label for="dueDateInput">Choose a date</label>
+                        <input type="date" id="dueDateInput">
+
+                        <label for="dueTimeInput">Choose time</label>
+                        <input type="time" id="dueTimeInput">
+
+                        <label for="priorityInput">Set level of priority</label>
+                        <select id="priorityInput">
+                            <option value="High">High</option>
+                            <option value="Mid" selected>Mid</option>
+                            <option value="Low">Low</option>
+                        </select>
+                        <button id="addBtn"><i class="fas fa-plus"></i> Add Task</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right column: task list + sort -->
+            <div class="tasks-right">
+                <div class="sort-options">
+                    <label for="sortSelect">Sort by:</label>
+                    <select id="sortSelect">
+                        <option value="added">Date Added</option>
+                        <option value="due">Due Date</option>
+                        <option value="priority">Priority</option>
+                    </select>
+                </div>
+
+                <ul id="taskList"></ul>
+            </div>
+
         </div>
 
-        <div class="sort-options">
-            <label for="sortSelect">Sort by:</label>
-            <select id="sortSelect">
-                <option value="added">Date Added</option>
-                <option value="due">Due Date</option>
-                <option value="priority">Priority</option>
-            </select>
-        </div>
 
-        <ul id="taskList"></ul>
-    </div>
 
     <div id="snackbar"></div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <script>
+    async function loadGreeting() {
+    try {
+        // Ask the server who is logged in
+        const res = await fetch("/accounts/whoami");
+        const data = await res.json();
+
+        // If authenticated, show name
+        if (data.authenticated && data.user) {
+        document.getElementById("greetName").textContent = `Hello, ${data.user.name}!`;
+        } else {
+        document.getElementById("greetName").textContent = "Hello!";
+        }
+
+        // Format today's date
+        const options = { weekday: "long", month: "long", day: "numeric" };
+        const today = new Date().toLocaleDateString("en-US", options);
+        document.getElementById("greetDate").textContent = today;
+    } catch (e) {
+        console.log("Greeting load failed:", e);
+    }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadGreeting);
+    </script>
+
 </body>
 </html>
