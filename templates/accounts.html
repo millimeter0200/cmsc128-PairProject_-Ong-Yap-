@@ -45,7 +45,6 @@
       margin-top: -10px;
     }
 
-    /*username and name*/
     .info {
       margin-bottom: 16px;
       padding: 12px;
@@ -94,17 +93,16 @@
       margin-bottom: 12px;
     }
 
-   .actions {
-      display: flex;          /* makes children flex items */
-      flex-direction: row;    /* default, ensures horizontal alignment */
-      justify-content: flex-start; /* aligns items to the start (left) */
-      align-items: center;    /* vertically centers the buttons */
-      gap: 8px;               /* space between buttons */
-      margin-top: 16px;       /* space above the row */
-      flex-wrap: wrap;        /* allows wrapping to next line if screen is too small */
+    .actions {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
       margin-left: 260px;
     }
-
 
     #topLoginAlert {
       display: none;
@@ -117,10 +115,14 @@
 
 <body class="accounts-page">
 
+  <!-- Back to main tasks -->
   <button id="backToTasksBtn" 
         style="background-color:transparent; color:rgb(0, 0, 0); border:none; font-weight:600; font-size: 1.2rem; cursor:pointer; position:fixed; top:50px; right:145px;">
     ◀ Back 
   </button>
+
+  <!-- Collaborative To-Do List -->
+  <button id="goToCollabBtn" class="btn">Collaborative To-Do List</button>
 
   <div class="container">
     <div id="topLoginAlert"></div>
@@ -139,11 +141,36 @@
       </p>
     </div>
 
+    <div id="forgotBox" class="hidden">
+      <h3>Forgot Password</h3>
+      <input id="forgotUsername" placeholder="Username" />
+      <input id="forgotEmail" type="email" placeholder="Email" />
+      <div style="margin:10px 0;">
+        <button id="forgotBtn" class="btn">Send Reset Code</button>
+        <button id="cancelForgot" class="btn">Cancel</button>
+      </div>
+    </div>
+
+    <!-- RESET PASSWORD -->
+    <div id="resetBox" class="hidden">
+      <h3>Reset Password</h3>
+      <input id="resetUsername" placeholder="Username" />
+      <input id="resetToken" placeholder="Reset Code" />
+      <input id="resetNewPw" type="password" placeholder="New Password" />
+      <div style="margin:10px 0;">
+        <button id="resetBtn" class="btn">Reset Password</button>
+        <button id="cancelReset" class="btn">Cancel</button>
+      </div>
+    </div>
+
+
+
     <!-- REGISTER -->
     <div id="registerBox" class="hidden">
       <h3>Create Account</h3>
       <input id="regName" placeholder="Full name" />
       <input id="regUsername" placeholder="Username" />
+      <input id="regEmail" type="email" placeholder="Email" />
       <input id="regPassword" type="password" placeholder="Password" />
       <input id="regPasswordConfirm" type="password" placeholder="Confirm password" />
       <div style="margin:10px 0;">
@@ -155,10 +182,10 @@
     <!-- PROFILE AREA -->
     <div id="profileArea" class="hidden">
       <div class="profile-pic"></div>
-
       <div class="info">
-        <p><strong>Username:</strong> <span id="meUsername"></span></p>
         <p><strong>Name:</strong> <span id="meName"></span></p>
+        <p><strong>Username:</strong> <span id="meUsername"></span></p>
+        <p><strong>Email:</strong> <span id="meEmail"></span></p>
       </div>
 
       <div class="actions profile-actions">
@@ -167,7 +194,6 @@
         <button id="cancelEditBtn" class="btn hidden">Cancel</button>
         <button id="changePasswordBtn" class="btn">Change Password</button>
       </div>
-
 
       <div id="changePasswordFields" class="hidden">
         <input id="currentPassword" type="password" placeholder="Current password" />
@@ -178,54 +204,21 @@
     </div>
 
     <div class="actions account-actions">
-        <button id="logoutBtn" class="btn">Logout</button>
+      <button id="logoutBtn" class="btn">Logout</button>
     </div>
-
-    <!-- FORGOT PASSWORD -->
-    <div id="forgotBox" class="hidden">
-      <h3>Forgot Password</h3>
-      <p style="font-size: 14px; color: #555; margin-bottom: 10px;">
-        Enter your username and email below to receive the reset code.
-      </p>
-      <input
-        id="forgotUsername"
-        placeholder="Enter your username"
-        class="input-field"
-      />
-      <input
-        id="forgotEmail"
-        type="email"
-        placeholder="Enter your email below to send the reset code"
-        class="input-field"
-      />
-      <div style="margin: 10px 0;">
-        <button id="forgotBtn" type="button" class="btn">Send Reset Code</button>
-      </div>
-      <a href="#" id="cancelForgot" onclick="showLogin()">Back to Login</a>
-    </div>
-
-    <!-- RESET PASSWORD -->
-    <div id="resetBox" class="hidden">
-      <h3>Reset Password</h3>
-      <input
-        id="resetUsername"
-        placeholder="Your username"
-        class="input-field"
-      />
-      <input id="resetToken" placeholder="Reset code" class="input-field" />
-      <input
-        id="resetNewPw"
-        type="password"
-        placeholder="New password"
-        class="input-field"
-      />
-      <div style="margin: 10px 0;">
-        <button id="resetBtn" type="button" class="btn">Reset Password</button>
-      </div>
-      <a href="#" onclick="showLogin()">Back to Login</a>
-    </div>
-
+  </div>
 
   <script src="{{ url_for('static', filename='accounts.js') }}"></script>
+  <script>
+    // Navigate to collab page
+    document.getElementById('goToCollabBtn').addEventListener('click', () => {
+        window.location.href = '/collab';
+    });
+
+    // Back to main tasks page
+    document.getElementById('backToTasksBtn').addEventListener('click', () => {
+        window.location.href = '/todo';
+    });
+  </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 function el(id) { return document.getElementById(id); }
+
 function showTopAlert(msg) {
   const n = el('topLoginAlert');
   if (!n) return;
@@ -72,17 +73,30 @@ async function loginHandler() {
 }
 
 /* --- REGISTER --- */
+/* --- REGISTER --- */
 async function registerHandler() {
   hideTopAlert();
   const name = (el('regName')?.value || '').trim();
   const username = (el('regUsername')?.value || '').trim();
+  const email = (el('regEmail')?.value || '').trim(); // NEW
   const pw = (el('regPassword')?.value || '');
   const pwc = (el('regPasswordConfirm')?.value || '');
-  if (!name || !username || !pw) return showTopAlert('Fill all fields');
+
+  // Validate fields
+  if (!name || !username || !email || !pw || !pwc) {
+    return showTopAlert('Fill all fields');
+  }
+
+  // Validate password match
   if (pw !== pwc) return showTopAlert('Passwords do not match');
 
+  // Optional: basic email validation
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) return showTopAlert('Enter a valid email');
+
   try {
-    await apiPost('/accounts/register', { name, username, password: pw });
+    // Send data to server
+    await apiPost('/accounts/register', { name, username, email, password: pw });
     showTopAlert('Account created. You may now log in.');
     showLogin();
   } catch (err) {
@@ -90,44 +104,86 @@ async function registerHandler() {
   }
 }
 
+
 /* --- PROFILE --- */
+let originalUsername = '';
+let originalName = '';
+
 async function refreshProfile() {
   try {
     const who = await apiGet('/accounts/whoami');
-    if (who.authenticated) {
-      const prof = await apiGet('/accounts/profile');
-      const user = prof.user;
-
-      // Show user info beside labels
-      el('meUsername').textContent = `Username: ${user.username}`;
-      el('meName').textContent = `Name: ${user.name}`;
-
-      showProfileArea();
-      return true;
-    } else {
+    if (!who.authenticated) {
       showLogin();
+      return false;
     }
+
+    const prof = await apiGet('/accounts/profile');
+    const user = prof.user;
+
+    el('meName').textContent = user.name || '';
+    el('meUsername').textContent = user.username || '';
+    el('meEmail').textContent = user.email || ''; // make sure this is included
+
+    originalName = user.name || '';
+    originalUsername = user.username || '';
+    originalEmail = user.email || ''; // save for cancel edit
+
+    showProfileArea();
+    return true;
   } catch (err) {
+    console.error('refreshProfile error:', err);
+    showTopAlert('Failed to load profile');
     showLogin();
+    return false;
   }
 }
 
-/* --- EDIT PROFILE --- */
+
+function enableEditMode() {
+  ['meUsername', 'meName'].forEach(id => {
+    const span = el(id);
+    span.contentEditable = true;
+    span.classList.add('editable-span');
+  });
+
+  el('editProfileBtn').classList.add('hidden');
+  el('saveProfileBtn').classList.remove('hidden');
+  el('cancelEditBtn').classList.remove('hidden');
+}
+
+function disableEditMode() {
+  ['meUsername', 'meName'].forEach(id => {
+    const span = el(id);
+    span.contentEditable = false;
+    span.classList.remove('editable-span');
+  });
+
+  el('editProfileBtn').classList.remove('hidden');
+  el('saveProfileBtn').classList.add('hidden');
+  el('cancelEditBtn').classList.add('hidden');
+}
+
+function cancelEdit() {
+  el('meUsername').textContent = originalUsername;
+  el('meName').textContent = originalName;
+  disableEditMode();
+}
+
 async function saveProfile() {
   hideTopAlert();
-  const name = (el('editName')?.value || '').trim();
-  const username = (el('editUsername')?.value || '').trim();
+  const username = el('meUsername').textContent.trim();
+  const name = el('meName').textContent.trim();
 
   try {
     const res = await fetch('/accounts/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, username })
+      body: JSON.stringify({ username, name })
     });
 
     if (res.ok) {
       showTopAlert('Profile updated successfully!');
-      el('editFields').classList.add('hidden');
+      disableEditMode();
       await refreshProfile();
     } else {
       const err = await res.json();
@@ -158,19 +214,25 @@ async function changePasswordHandler() {
 }
 
 /* --- FORGOT PASSWORD --- */
+/* --- FORGOT PASSWORD --- */
 async function forgotPasswordHandler() {
   hideTopAlert();
   const username = (el('forgotUsername')?.value || '').trim();
-  if (!username) return showTopAlert('Enter your email');
+  const email = (el('forgotEmail')?.value || '').trim();
+
+  if (!username || !email) {
+    return showTopAlert('Enter both your username and email');
+  }
 
   try {
-    const res = await apiPost('/accounts/forgot', { username });
-    showTopAlert(res.message || 'Check your email for reset code');
+    const res = await apiPost('/accounts/forgot', { username, email });
+    showTopAlert(res.message || 'Reset code sent! Check your email.');
     showResetBox();
   } catch (err) {
     showTopAlert(normalizeErrorMessage(err));
   }
 }
+
 
 async function resetPasswordHandler() {
   hideTopAlert();
@@ -202,33 +264,27 @@ function bind() {
   el('registerBtn')?.addEventListener('click', registerHandler);
   el('forgotBtn')?.addEventListener('click', forgotPasswordHandler);
   el('resetBtn')?.addEventListener('click', resetPasswordHandler);
+  el('cancelReset')?.addEventListener('click', showLogin); // cancel goes back to login
   el('saveProfileBtn')?.addEventListener('click', saveProfile);
+  el('cancelEditBtn')?.addEventListener('click', cancelEdit);
+  el('editProfileBtn')?.addEventListener('click', enableEditMode);
   el('savePasswordBtn')?.addEventListener('click', changePasswordHandler);
   el('logoutBtn')?.addEventListener('click', logout);
+  el('goToCollabBtn')?.addEventListener('click', () => {
+    window.location.href = "/collab"; // Correct route
+});
+
 
   el('cancelRegister')?.addEventListener('click', showLogin);
   el('showRegisterLink')?.addEventListener('click', e => { e.preventDefault(); showRegisterBox(); });
   el('showForgotLink')?.addEventListener('click', e => { e.preventDefault(); showForgotBox(); });
 
-  // Profile buttons
-  el('editProfileBtn')?.addEventListener('click', () => {
-    el('editFields').classList.remove('hidden');
-    el('editUsername').value = el('meUsername').textContent.replace('Username: ', '');
-    el('editName').value = el('meName').textContent.replace('Name: ', '');
-  });
-
-  el('cancelEditBtn')?.addEventListener('click', () => {
-    el('editFields').classList.add('hidden');
-  });
-
   el('changePasswordBtn')?.addEventListener('click', () => {
     el('changePasswordFields').classList.remove('hidden');
   });
-
   el('cancelPasswordBtn')?.addEventListener('click', () => {
     el('changePasswordFields').classList.add('hidden');
   });
-
   el('backToTasksBtn')?.addEventListener('click', () => {
     window.location.href = '/todo';
   });
@@ -237,5 +293,10 @@ function bind() {
 /* --- INIT --- */
 document.addEventListener('DOMContentLoaded', async () => {
   bind();
-  await refreshProfile();
+  const loggedIn = await refreshProfile();
+  if (!loggedIn) showLogin();
+});
+
+document.getElementById('collabTDLBtn').addEventListener('click', () => {
+    window.location.href = 'collab.html';
 });

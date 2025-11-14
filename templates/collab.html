@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Collaborative To-Do Lists</title>
+    <style>
+        .hidden { display: none; }
+        .btn { padding: 8px 12px; margin: 4px; cursor: pointer; }
+        #collabAlert { margin-top: 10px; font-weight: 600; }
+        #collabLists div { cursor: pointer; margin: 4px 0; padding: 4px; border: 1px solid #ccc; border-radius: 4px; }
+        #collabLists div.selected { background-color: #d0f0d0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Collaborative To-Do Lists</h1>
+
+    <!-- Back to Personal Tasks -->
+    <button id="backToPersonalBtn" class="btn">Back to Personal Tasks</button>
+
+    <!-- Create new collab list -->
+    <div style="margin-top:20px;">
+        <input id="collabName" placeholder="New list name" />
+        <button id="createCollabBtn" class="btn">Create List</button>
+    </div>
+
+    <!-- Add collaborator -->
+    <div style="margin-top:20px;">
+        <select id="collabUserSelect"></select>
+        <button id="addCollabBtn" class="btn">Add Collaborator</button>
+    </div>
+
+    <!-- Message alert -->
+    <div id="collabAlert"></div>
+
+    <!-- VIEW COLLAB LISTS -->
+    <h2>Your Collaborative Lists</h2>
+    <div id="collabLists"></div>
+
+    <hr>
+
+    <!-- TASKS INSIDE A SELECTED COLLAB LIST -->
+    <h2 id="currentListTitle">Select a list to view tasks</h2>
+
+    <div id="collabTasks"></div>
+
+    <!-- ADD TASK TO CURRENT COLLAB LIST -->
+    <div id="taskInputArea" class="hidden">
+        <input type="text" id="newTask" placeholder="Enter a new task">
+        <button id="addTaskBtn" class="btn">Add Task</button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='collab.js') }}"></script>
+</body>
+</html>

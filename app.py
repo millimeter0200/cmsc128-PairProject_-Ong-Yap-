@@ -70,6 +70,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True, nullable=False)
     name = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(300), nullable=False)
     reset_token = db.Column(db.String(200), nullable=True)
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
@@ -88,6 +89,27 @@ class User(db.Model):
             "name": self.name,
             "date_created": self.date_created.strftime("%m-%d-%Y %I:%M %p")
         }
+
+# ---------------- COLLAB LIST MODEL ----------------#
+class CollabList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class CollabMember(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    list_id = db.Column(db.Integer, db.ForeignKey('collab_list.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
+class CollabTask(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    list_id = db.Column(db.Integer, db.ForeignKey('collab_list.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    done = db.Column(db.Boolean, default=False)
+
 
 with app.app_context():
     db.create_all()
@@ -117,18 +139,30 @@ def get_current_user():
 @app.route('/accounts/register', methods=['POST'])
 def accounts_register():
     data = request.json or {}
-    username = (data.get('username') or '').strip().lower()
-    password = data.get('password') or ''
     name = (data.get('name') or '').strip()
-    if not username or not password or not name:
-        return jsonify({"error": "All fields required"}), 400
-    if User.query.filter_by(username=username).first():
-        return jsonify({"error": "Username already taken"}), 409
-    user = User(username=username, name=name)
-    user.set_password(password)
+    username = (data.get('username') or '').strip().lower()
+    email = (data.get('email') or '').strip().lower()  # NEW
+    password = data.get('password')
+
+    if not name or not username or not email or not password:
+        return jsonify({"error": "Fill all fields"}), 400
+
+    # Check duplicates
+    if User.query.filter((User.username==username) | (User.email==email)).first():
+        return jsonify({"error": "Username or email already exists"}), 400
+
+    # Hash password
+    from werkzeug.security import generate_password_hash
+    user = User(
+        name=name,
+        username=username,
+        email=email,
+        password_hash=generate_password_hash(password)
+    )
     db.session.add(user)
     db.session.commit()
-    return jsonify({"message": "Account created"}), 201
+    return jsonify({"success": True})
+
 
 # ---------- LOGIN ----------
 @app.route('/accounts/login', methods=['POST'])
@@ -188,7 +222,7 @@ def accounts_change_password():
     return jsonify({"message": "Password changed"})
 
 # ---------- FORGOT PASSWORD ----------
-# Forgot password: generate short 6-character token and log it to console (simulate email)
+# Forgot password: generate short 6-character token and send email
 @app.route('/accounts/forgot', methods=['POST'])
 def accounts_forgot():
     data = request.json or {}
@@ -209,9 +243,10 @@ def accounts_forgot():
     try:
         msg = Message(
             subject="Password Reset Code",
-            recipients=[user.username],  # assuming username is the email
+            recipients=[user.email],  # comma is required
             body=f"Hello {user.name},\n\nYour password reset code is: {token}\nThis code will expire in 20 minutes."
         )
+
         mail.send(msg)
     except Exception as e:
         print("Failed to send email:", e)
@@ -356,6 +391,167 @@ def todo_page():
     if not session.get('user_id'):
         return render_template('accounts.html')
     return render_template('index.html')
+
+# Add this route near the other page routes
+@app.route('/collab')
+def collab_page():
+    if not session.get('user_id'):
+        return render_template('accounts.html')  # redirect to login if not logged in
+    return render_template('collab.html')
+
+# ---------------- COLLAB ROUTES ----------------
+
+def collab_user_allowed(list_id):
+    """Check if the logged-in user is owner or collaborator."""
+    uid = session.get("user_id")
+    if not uid:
+        return None
+
+    cl = CollabList.query.filter_by(id=list_id).first()
+    if not cl:
+        return None
+
+    if cl.owner_id == uid:
+        return cl
+
+    member = CollabMember.query.filter_by(list_id=list_id, user_id=uid).first()
+    if member:
+        return cl
+
+    return None
+
+# Get all lists for user
+@app.route('/collab/lists', methods=['GET'])
+def get_collab_lists():
+    user, err = ensure_login()
+    if err:
+        return err
+
+    owned = CollabList.query.filter_by(owner_id=user.id).all()
+    member = CollabMember.query.filter_by(user_id=user.id).all()
+
+    member_lists = []
+    for m in member:
+        lst = CollabList.query.filter_by(id=m.list_id).first()
+        if lst:
+            member_lists.append(lst)
+
+    result = [{"id": l.id, "name": l.name} for l in owned + member_lists]
+    return jsonify({"lists": result})
+
+
+# Create a new list
+@app.route('/collab/create', methods=['POST'])
+def create_collab_list():
+    user, err = ensure_login()
+    if err:
+        return err
+
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    if not name:
+        return jsonify({"error": "List name required"}), 400
+
+    new_list = CollabList(name=name, owner_id=user.id)
+    db.session.add(new_list)
+    db.session.commit()
+
+    print("Created list:", new_list.id, new_list.name, new_list.owner_id)  # <-- debug
+    return jsonify({"message": "List created", "id": new_list.id}), 201
+
+
+
+# Add collaborator
+@app.route('/collab/<int:list_id>/add_member', methods=['POST'])
+def add_collaborator(list_id):
+    user, err = ensure_login()
+    if err:
+        return err
+
+    cl = CollabList.query.filter_by(id=list_id, owner_id=user.id).first()
+    if not cl:
+        return jsonify({"error": "Only owner can add collaborators"}), 403
+
+    data = request.json or {}
+    username = data.get("username", "").strip().lower()
+
+    target = User.query.filter_by(username=username).first()
+    if not target:
+        return jsonify({"error": "User not found"}), 404
+
+    # prevent duplicates
+    exists = CollabMember.query.filter_by(list_id=list_id, user_id=target.id).first()
+    if exists:
+        return jsonify({"error": "Already a collaborator"}), 409
+
+    cm = CollabMember(list_id=list_id, user_id=target.id)
+    db.session.add(cm)
+    db.session.commit()
+
+    return jsonify({"message": "Collaborator added"})
+
+
+# Get tasks for list
+@app.route('/collab/<int:list_id>/tasks', methods=['GET'])
+def get_collab_tasks(list_id):
+    allowed = collab_user_allowed(list_id)
+    if not allowed:
+        return jsonify({"error": "Not allowed"}), 403
+
+    tasks = CollabTask.query.filter_by(list_id=list_id).all()
+    return jsonify([{"id": t.id, "title": t.title, "done": t.done} for t in tasks])
+
+
+# Add task
+@app.route('/collab/<int:list_id>/add_task', methods=['POST'])
+def add_collab_task(list_id):
+    allowed = collab_user_allowed(list_id)
+    if not allowed:
+        return jsonify({"error": "Not allowed"}), 403
+
+    data = request.json or {}
+    title = data.get("title", "").strip()
+    if not title:
+        return jsonify({"error": "Title required"}), 400
+
+    t = CollabTask(list_id=list_id, title=title)
+    db.session.add(t)
+    db.session.commit()
+
+    return jsonify({"message": "Task added"})
+
+
+# Toggle done
+@app.route('/collab_task/<int:task_id>', methods=['PUT'])
+def toggle_collab_task(task_id):
+    task = CollabTask.query.get(task_id)
+    if not task:
+        return jsonify({"error": "Task not found"}), 404
+
+    allowed = collab_user_allowed(task.list_id)
+    if not allowed:
+        return jsonify({"error": "Not allowed"}), 403
+
+    data = request.json or {}
+    task.done = bool(data.get("done"))
+    db.session.commit()
+    return jsonify({"message": "Updated"})
+
+
+# Delete task
+@app.route('/collab_task/<int:task_id>', methods=['DELETE'])
+def delete_collab_task(task_id):
+    task = CollabTask.query.get(task_id)
+    if not task:
+        return jsonify({"error": "Task not found"}), 404
+
+    allowed = collab_user_allowed(task.list_id)
+    if not allowed:
+        return jsonify({"error": "Not allowed"}), 403
+
+    db.session.delete(task)
+    db.session.commit()
+    return jsonify({"message": "Deleted"})
 
 
 if __name__ == '__main__':
