@@ -1,48 +1,139 @@
+/* GLOBAL */
 body {
+    margin: 0;
     font-family: 'Poppins', sans-serif;
-    background-color: #f8f8f8;
-    padding: 20px;
+    background: url("background.jpg") center/cover no-repeat fixed;
 }
 
-h1 {
+/* PAGE WRAPPER */
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* MAIN CARD */
+.collab-card {
+    background: rgba(255,255,255,0.93);
+    width: 95%;
+    max-width: 1050px;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+/* HEADER BAR */
+.collab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+/* ALERT */
+.alert {
     text-align: center;
-    margin-bottom: 30px;
+    font-weight: 600;
+    min-height: 24px;
 }
 
-.list-switch {
+/* TOP CONTROLS */
+.top-controls {
+    display: flex;
+    gap: 20px;
     margin-bottom: 20px;
 }
 
-#addTaskSection, #inviteSection {
-    margin-top: 20px;
+.control-box {
+    background: #f3f4f6;
+    flex: 1;
+    padding: 15px;
+    border-radius: 12px;
 }
 
-input, select, button {
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    margin-right: 10px;
+.control-box h3 {
+    margin-top: 0;
 }
 
-button {
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
+/* MAIN BODY */
+.main-area {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 25px;
 }
 
-button:hover {
-    background-color: #45a049;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
+/* PANELS */
+.lists-panel,
+.tasks-panel {
     background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* LISTS */
+.list-box div {
     padding: 10px;
     border-radius: 8px;
-    margin-bottom: 8px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    margin-bottom: 6px;
+}
+
+.list-box div:hover {
+    background: #f1f5ff;
+}
+
+.list-box div.selected {
+    background: #dbeafe;
+    border-color: #2563eb;
+}
+
+/* TASK DISPLAY */
+.task-box div {
+    padding: 8px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    background: #f9fafb;
+}
+
+/* TASK INPUT */
+.task-input {
+    display: flex;
+    margin-top: 10px;
+    gap: 8px;
+}
+
+/* INPUTS */
+input, select {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    margin-bottom: 6px;
+}
+
+/* BUTTONS *//* BUTTON STYLE MATCHING MAIN APP (PASTEL GRADIENT) */
+.btn {
+    background: linear-gradient(135deg, #edd5e5, #d1edf8, #c5d3ed);
+    border: none;
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #000;
+    transition: 0.25s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.btn:active {
+    transform: translateY(0);
 }

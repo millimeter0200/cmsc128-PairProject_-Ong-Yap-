@@ -1,59 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Collaborative To-Do Lists</title>
-    <style>
-        .hidden { display: none; }
-        .btn { padding: 8px 12px; margin: 4px; cursor: pointer; }
-        #collabAlert { margin-top: 10px; font-weight: 600; }
-        #collabLists div { cursor: pointer; margin: 4px 0; padding: 4px; border: 1px solid #ccc; border-radius: 4px; }
-        #collabLists div.selected { background-color: #d0f0d0; }
-    </style>
+<meta charset="UTF-8" />
+<title>Collaborative To-Do Lists</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='collab.css') }}">
+
+<style>
+.hidden { display: none; }
+</style>
 </head>
+
 <body>
 
-<div class="container">
+<div class="page-wrapper">
 
-    <h1>Collaborative To-Do Lists</h1>
+  <div class="collab-card">
 
-    <!-- Back to Personal Tasks -->
-    <button id="backToPersonalBtn" class="btn">Back to Personal Tasks</button>
-
-    <!-- Create new collab list -->
-    <div style="margin-top:20px;">
-        <input id="collabName" placeholder="New list name" />
-        <button id="createCollabBtn" class="btn">Create List</button>
+    <!-- HEADER -->
+    <div class="collab-header">
+      <h1>Collaborative To-Do Lists</h1>
+      <button id="backToPersonalBtn" class="btn back-btn">Back</button>
     </div>
 
-    <!-- Add collaborator -->
-    <div style="margin-top:20px;">
+    <!-- ALERT -->
+    <div id="collabAlert" class="alert"></div>
+
+    <!-- TOP FORMS -->
+    <div class="top-controls">
+
+      <div class="control-box">
+        <h3>Create List</h3>
+        <input id="collabName" placeholder="New list name">
+        <button id="createCollabBtn" class="btn primary">Create</button>
+      </div>
+
+      <div class="control-box">
+        <h3>Invite Collaborator</h3>
         <select id="collabUserSelect"></select>
-        <button id="addCollabBtn" class="btn">Add Collaborator</button>
+        <button id="addCollabBtn" class="btn primary">Add</button>
+      </div>
+
     </div>
 
-    <!-- Message alert -->
-    <div id="collabAlert"></div>
+    <!-- MAIN BODY -->
+    <div class="main-area">
 
-    <!-- VIEW COLLAB LISTS -->
-    <h2>Your Collaborative Lists</h2>
-    <div id="collabLists"></div>
+      <!-- LEFT -->
+      <div class="lists-panel">
+        <h3>Your Lists</h3>
+        <div id="collabLists" class="list-box"></div>
+      </div>
 
-    <hr>
+      <!-- RIGHT -->
+      <div class="tasks-panel">
 
-    <!-- TASKS INSIDE A SELECTED COLLAB LIST -->
-    <h2 id="currentListTitle">Select a list to view tasks</h2>
+        <h3 id="currentListTitle">Select a list</h3>
 
-    <div id="collabTasks"></div>
+        <div id="collabTasks" class="task-box"></div>
 
-    <!-- ADD TASK TO CURRENT COLLAB LIST -->
-    <div id="taskInputArea" class="hidden">
-        <input type="text" id="newTask" placeholder="Enter a new task">
-        <button id="addTaskBtn" class="btn">Add Task</button>
+        <div id="taskInputArea" class="task-input hidden">
+          <input id="newTask" placeholder="Enter a task">
+          <button id="addTaskBtn" class="btn success">Add</button>
+        </div>
+
+      </div>
+
     </div>
+
+  </div>
 
 </div>
 
 <script src="{{ url_for('static', filename='collab.js') }}"></script>
+
 </body>
 </html>
