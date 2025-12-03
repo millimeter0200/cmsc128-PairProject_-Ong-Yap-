@@ -185,6 +185,7 @@ li.done {
 }
 
 .account-actions .btn:hover {
+ background-color: #484848;
 }
 
 /* Layout for horizontal alignment */
