@@ -9,16 +9,27 @@ from zoneinfo import ZoneInfo
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
 from sqlalchemy import case
-
+import os
 import random
 import string
 
-
+# ============================
+# ===== INIT APP + CONFIG ====
+# ============================
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
+
+# Secret key (secure)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
+
+# DATABASE: Switch automatically between SQLite (local) and PostgreSQL (Render)
+db_url = os.environ.get("DATABASE_URL")
+
+if db_url and db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url or "sqlite:///todo.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = 'dev-secret-key-change-me'
 
 db = SQLAlchemy(app)
 
@@ -29,15 +40,20 @@ db = SQLAlchemy(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = 'yapmaemaricar@gmail.com'
-app.config['MAIL_PASSWORD'] = 'varq vhhx lrfb rhut'
-app.config['MAIL_DEFAULT_SENDER'] = ('My ToDo App', 'your_email@gmail.com')
+
+# Use environment variables (Gmail App Password)
+app.config['MAIL_USERNAME'] = os.environ.get("yapmaemaricar@gmail.com", "")
+app.config['MAIL_PASSWORD'] = os.environ.get("varq vhhx lrfb rhut", "")
+
+app.config['MAIL_DEFAULT_SENDER'] = (
+    'My ToDo App',
+    os.environ.get("MAIL_USERNAME", "")
+)
 
 mail = Mail(app)
 
 # ============================
-# ===== USER MODEL ===========
+# ===== MODELS ===============
 # ============================
 
 class User(db.Model):
@@ -66,10 +82,6 @@ class User(db.Model):
         }
 
 
-# ============================
-# ===== PERSONAL TASK MODEL ==
-# ============================
-
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -80,10 +92,8 @@ class Task(db.Model):
     done = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
-        # Split due_date into date + time
-        due_date_only = ""
-        due_time_only = ""
 
+        due_date_only, due_time_only = "", ""
         if self.due_date:
             parts = self.due_date.split(" ")
             if len(parts) >= 1:
@@ -98,14 +108,9 @@ class Task(db.Model):
             "due_time": due_time_only,
             "priority": self.priority,
             "done": self.done,
-            "date_added": self.date_added.strftime("%Y-%m-%d %H:%M") if self.date_added else ""
+            "date_added": self.date_added.strftime("%Y-%m-%d %H:%M")
         }
 
-
-
-# ============================
-# ===== COLLAB MODELS ========
-# ============================
 
 class CollabList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -123,30 +128,24 @@ class CollabMember(db.Model):
 class CollabTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     list_id = db.Column(db.Integer, db.ForeignKey('collab_list.id'), nullable=False)
-
     title = db.Column(db.String(200), nullable=False)
-
-    # ✨ NEW CLEAN FORMAT:
-    # due_date stores BOTH date and time → "YYYY-MM-DD HH:MM"
     due_date = db.Column(db.String(100), nullable=True)
-
     priority = db.Column(db.String(10), default="Mid")
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     done = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
 
-        # convert date_added to Manila time
         dt = self.date_added
         if dt and dt.tzinfo is None:
             dt = dt.replace(tzinfo=timezone.utc)
-        added_str = dt.astimezone(ZoneInfo("Asia/Manila")).strftime("%m-%d-%Y %I:%M %p") if dt else ""
 
-        # format due_date
+        added_str = dt.astimezone(ZoneInfo("Asia/Manila")).strftime("%m-%d-%Y %I:%M %p")
+
         formatted_due = self.due_date
         if self.due_date:
             try:
-                if len(self.due_date.strip()) == 10:
+                if len(self.due_date) == 10:
                     d = datetime.strptime(self.due_date, "%Y-%m-%d")
                     formatted_due = d.strftime("%m-%d-%Y")
                 else:
@@ -166,9 +165,20 @@ class CollabTask(db.Model):
         }
 
 
+# Create tables
 with app.app_context():
     db.create_all()
 
+# ============================
+# ===== SECURITY: NO CACHE ===
+# ============================
+
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 # ============================
 # ===== AUTH HELPERS =========
@@ -188,17 +198,9 @@ def ensure_login():
     user = db.session.get(User, user_id)
     return user, None
 
-
 # ============================
 # ===== PUBLIC ROUTES ========
 # ============================
-
-@app.after_request
-def add_no_cache_headers(response):
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
 
 @app.route('/')
 def welcome():
@@ -209,10 +211,7 @@ def welcome():
 
 @app.route('/accounts')
 def accounts_page():
-    if not session.get("user_id"):
-        return render_template("accounts.html")  # Show login page
-    return render_template("accounts.html")      # JS will show profile after whoami
-
+    return render_template("accounts.html")
 
 # ============================
 # ===== REGISTER =============
@@ -229,7 +228,6 @@ def accounts_register():
     if not name or not username or not email or not password:
         return jsonify({"error": "Fill all fields"}), 400
 
-    # Check duplicates
     if User.query.filter(
         (User.username == username) | (User.email == email)
     ).first():
@@ -244,7 +242,6 @@ def accounts_register():
     db.session.add(user)
     db.session.commit()
     return jsonify({"success": True})
-
 
 # ============================
 # ===== LOGIN / LOGOUT =======
@@ -267,10 +264,8 @@ def accounts_login():
 
 @app.route('/accounts/logout', methods=['POST'])
 def accounts_logout():
-    session.pop('user_id', None)
-    session.pop('username', None)
+    session.clear()
     return jsonify({"message": "Logged out"})
-
 
 # ============================
 # ===== PROFILE ROUTES =======
@@ -282,7 +277,6 @@ def accounts_profile():
     if not user:
         return jsonify({"error": "Not authenticated"}), 401
     return jsonify({"user": user.to_safe_dict()})
-
 
 @app.route('/accounts/profile', methods=['PUT'])
 def accounts_profile_update():
@@ -306,7 +300,6 @@ def accounts_profile_update():
     db.session.commit()
     return jsonify({"message": "Profile updated"})
 
-
 # ============================
 # ===== CHANGE PASSWORD ======
 # ============================
@@ -327,7 +320,6 @@ def accounts_change_password():
     user.set_password(new_pw)
     db.session.commit()
     return jsonify({"message": "Password changed"})
-
 
 # ============================
 # ===== FORGOT PASSWORD ======
@@ -353,20 +345,14 @@ def accounts_forgot():
         msg = Message(
             subject="Password Reset Code",
             recipients=[user.email],
-            body=(
-                f"Hello {user.name},\n\n"
-                f"Your password reset code is: {token}\n"
-                f"This code will expire in 20 minutes."
-            )
+            body=f"Hello {user.name},\n\nYour reset code is {token}. It expires in 20 minutes."
         )
         mail.send(msg)
-
     except Exception as e:
         print("Mail error:", e)
         return jsonify({"error": "Failed to send email"}), 500
 
     return jsonify({"message": "Reset code sent"})
-
 
 # ============================
 # ===== RESET PASSWORD =======
@@ -395,7 +381,6 @@ def accounts_reset():
 
     return jsonify({"message": "Password reset successful"})
 
-
 # ============================
 # ===== WHOAMI ===============
 # ============================
@@ -405,12 +390,7 @@ def accounts_whoami():
     user = get_current_user()
     if not user:
         return jsonify({"authenticated": False})
-
-    return jsonify({
-        "authenticated": True,
-        "user": user.to_safe_dict()
-    })
-
+    return jsonify({"authenticated": True, "user": user.to_safe_dict()})
 
 # ============================
 # ===== PERSONAL TASKS =======
@@ -438,7 +418,6 @@ def get_tasks():
     tasks = Task.query.filter_by(user_id=user.id).order_by(order).all()
     return jsonify([t.to_dict() for t in tasks])
 
-
 @app.route("/add", methods=["POST"])
 def add_task():
     user, err = ensure_login()
@@ -446,8 +425,7 @@ def add_task():
         return err
 
     data = request.json or {}
-
-    title = (data.get("title") or "").strip()
+    title = (data.get("title") or "").trim()
     if not title:
         return jsonify({"error": "Title required"}), 400
 
@@ -467,7 +445,6 @@ def add_task():
     db.session.commit()
 
     return jsonify({"message": "Task added"}), 201
-
 
 @app.route("/update/<int:id>", methods=["PUT"])
 def update_task(id):
@@ -502,7 +479,6 @@ def update_task(id):
     db.session.commit()
     return jsonify({"message": "Task updated"})
 
-
 @app.route("/delete/<int:id>", methods=["DELETE"])
 def delete_task(id):
     user, err = ensure_login()
@@ -517,7 +493,6 @@ def delete_task(id):
     db.session.commit()
     return jsonify({"message": "Task deleted"})
 
-
 @app.route('/todo')
 def todo_page():
     if not session.get('user_id'):
@@ -528,19 +503,7 @@ def todo_page():
 # ===== COLLAB ROUTES ========
 # ============================
 
-@app.route('/collab')
-def collab_page():
-    if not session.get('user_id'):
-        return render_template('accounts.html')
-    return render_template('collab.html')
-
-
-# ----------------------------
-# Helper: Check if user has permission
-# ----------------------------
-
 def collab_user_allowed(list_id):
-    """Return list object if user is owner or collaborator."""
     uid = session.get("user_id")
     if not uid:
         return None
@@ -552,16 +515,18 @@ def collab_user_allowed(list_id):
     if cl.owner_id == uid:
         return cl
 
-    member = CollabMember.query.filter_by(list_id=list_id, user_id=uid).first()
-    if member:
+    if CollabMember.query.filter_by(list_id=list_id, user_id=uid).first():
         return cl
 
     return None
 
 
-# ============================
-# ===== GET LISTS FOR USER ===
-# ============================
+@app.route('/collab')
+def collab_page():
+    if not session.get("user_id"):
+        return render_template('accounts.html')
+    return render_template("collab.html")
+
 
 @app.route('/collab/lists', methods=['GET'])
 def get_collab_lists():
@@ -569,18 +534,16 @@ def get_collab_lists():
     if err:
         return err
 
-    owned_lists = CollabList.query.filter_by(owner_id=user.id).all()
+    owned = CollabList.query.filter_by(owner_id=user.id).all()
     member_links = CollabMember.query.filter_by(user_id=user.id).all()
 
-    member_lists = []
-    for m in member_links:
-        l = CollabList.query.filter_by(id=m.list_id).first()
-        if l:
-            member_lists.append(l)
+    member_lists = [CollabList.query.get(m.list_id) for m in member_links]
 
     final = []
-    for l in owned_lists + member_lists:
-        owner = db.session.get(User, l.owner_id)
+    for l in owned + member_lists:
+        if not l:
+            continue
+        owner = User.query.get(l.owner_id)
         final.append({
             "id": l.id,
             "name": l.name,
@@ -589,10 +552,6 @@ def get_collab_lists():
 
     return jsonify({"lists": final})
 
-
-# ============================
-# ===== CREATE LIST ==========
-# ============================
 
 @app.route('/collab/create', methods=['POST'])
 def create_collab_list():
@@ -613,10 +572,6 @@ def create_collab_list():
     return jsonify({"message": "List created", "id": new_list.id}), 201
 
 
-# ============================
-# ===== RENAME LIST ==========
-# ============================
-
 @app.route('/collab/<int:list_id>/rename', methods=['PUT'])
 def rename_collab_list(list_id):
     user, err = ensure_login()
@@ -631,16 +586,12 @@ def rename_collab_list(list_id):
 
     cl = CollabList.query.filter_by(id=list_id, owner_id=user.id).first()
     if not cl:
-        return jsonify({"error": "Only owner can rename this list"}), 403
+        return jsonify({"error": "Only owner can rename"}), 403
 
     cl.name = new_name
     db.session.commit()
     return jsonify({"message": "Renamed"})
 
-
-# ============================
-# ===== DELETE LIST ==========
-# ============================
 
 @app.route('/collab/<int:list_id>/delete', methods=['DELETE'])
 def delete_collab_list(list_id):
@@ -659,10 +610,6 @@ def delete_collab_list(list_id):
     db.session.commit()
     return jsonify({"message": "Deleted"})
 
-
-# ============================
-# ===== ADD COLLABORATOR =====
-# ============================
 
 @app.route('/collab/<int:list_id>/add_member', methods=['POST'])
 def add_collaborator(list_id):
@@ -692,10 +639,6 @@ def add_collaborator(list_id):
     return jsonify({"message": "Collaborator added"})
 
 
-# ============================
-# ===== LIST MEMBERS =========
-# ============================
-
 @app.route('/collab/<int:list_id>/members', methods=['GET'])
 def get_collab_members(list_id):
     cl = collab_user_allowed(list_id)
@@ -709,17 +652,13 @@ def get_collab_members(list_id):
         .all()
     )
 
-    is_owner = (session.get('user_id') == cl.owner_id)
+    is_owner = (session.get("user_id") == cl.owner_id)
 
     return jsonify({
         "members": [m[0] for m in members],
         "is_owner": is_owner
     })
 
-
-# ============================
-# ===== REMOVE MEMBER ========
-# ============================
 
 @app.route('/collab/<int:list_id>/remove_member', methods=['POST'])
 def remove_collaborator(list_id):
@@ -747,10 +686,6 @@ def remove_collaborator(list_id):
     return jsonify({"message": "Removed"})
 
 
-# ============================
-# ===== GET TASKS ============
-# ============================
-
 @app.route('/collab/<int:list_id>/tasks', methods=['GET'])
 def get_collab_tasks(list_id):
     cl = collab_user_allowed(list_id)
@@ -774,10 +709,6 @@ def get_collab_tasks(list_id):
     return jsonify([t.to_dict() for t in tasks])
 
 
-# ============================
-# ===== ADD TASK =============
-# ============================
-
 @app.route('/collab/<int:list_id>/add_task', methods=['POST'])
 def add_collab_task(list_id):
     cl = collab_user_allowed(list_id)
@@ -786,6 +717,7 @@ def add_collab_task(list_id):
 
     data = request.json or {}
     title = (data.get("title") or "").strip()
+
     if not title:
         return jsonify({"error": "Title required"}), 400
 
@@ -809,10 +741,6 @@ def add_collab_task(list_id):
 
     return jsonify({"message": "Task added", "id": t.id})
 
-
-# ============================
-# ===== UPDATE TASK ==========
-# ============================
 
 @app.route('/collab_task/<int:task_id>', methods=['PUT'])
 def update_collab_task(task_id):
@@ -848,10 +776,6 @@ def update_collab_task(task_id):
     return jsonify({"message": "Updated"})
 
 
-# ============================
-# ===== DELETE TASK ==========
-# ============================
-
 @app.route('/collab/<int:list_id>/delete_task/<int:task_id>', methods=['DELETE'])
 def delete_collab_task(list_id, task_id):
     cl = collab_user_allowed(list_id)
@@ -868,29 +792,9 @@ def delete_collab_task(list_id, task_id):
 
 
 # ============================
-# ===== USERS FOR SEARCH =====
-# ============================
-
-@app.route('/accounts/users', methods=['GET'])
-def accounts_users():
-    user, err = ensure_login()
-    if err:
-        return err
-
-    users = User.query.filter(User.id != user.id).all()
-    return jsonify({"users": [{"id": u.id, "username": u.username} for u in users]})
-
-@app.after_request
-def add_no_cache_headers(response):
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
-
-
-# ============================
 # ===== RUN APP ==============
 # ============================
 
 if __name__ == '__main__':
     app.run(debug=True)
+
