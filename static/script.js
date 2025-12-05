@@ -9,6 +9,49 @@ function el(tag, className) {
     return e;
 }
 
+function $(id) {
+    return document.getElementById(id);
+}
+
+function formatDateTime(raw) {
+    if (!raw) return "N/A";
+
+    const d = new Date(raw);
+    if (isNaN(d)) return raw; // fallback if backend string can't be parsed
+
+    return d.toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    });
+}
+
+function formatDue(date, time) {
+    if (!date) return "N/A";
+
+    // Case 1: time exists → return "YYYY-MM-DD HH:MM AM/PM"
+    if (time) {
+        const dt = new Date(`${date}T${time}`);
+        if (!isNaN(dt)) {
+            return dt.toLocaleString("en-US", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true
+            });
+        }
+    }
+
+    // Case 2: only date → format date only
+    return date;
+}
+
+
 // loads tasks from backend, sorted by user selection
 async function fetchTasks() {
     const sortSelect = document.getElementById('sortSelect');
@@ -53,9 +96,10 @@ function renderTaskList(tasks) {
 
         const meta = el('div', 'task-meta');
         const dueText = el('div');
-        dueText.textContent = `Due: ${task.due_date || "N/A"}`;
+        dueText.textContent = `Due: ${formatDue(task.due_date, task.due_time)}`;
         const addedText = el('small');
-        addedText.textContent = `Added: ${task.date_added}`;
+        addedText.textContent = `Added: ${formatDateTime(task.date_added)}`;
+
 
         meta.appendChild(dueText);
         meta.appendChild(addedText);
@@ -228,6 +272,37 @@ async function undoDelete() {
     fetchTasks();
 }
 
+if ($('renameListBtn')) {
+    $('renameListBtn').onclick = async () => {
+        const newName = prompt("Enter new list name:");
+        if (!newName) return;
+
+        await PUT(`/collab/${currentListId}/rename`, { name: newName });
+        snackbar("List renamed");
+        loadCollabLists();
+    };
+}
+
+if ($('deleteListBtn')) {
+    $('deleteListBtn').onclick = async () => {
+        if (!confirm("Delete this collaborative list?")) return;
+
+        await DELETE(`/collab/${currentListId}/delete`);
+        snackbar("List deleted");
+
+        currentListId = null;
+        loadCollabLists();
+
+        $('listHeader')?.classList.add('hidden');
+        $('collabTools')?.classList.add('hidden');
+        $('sortBar')?.classList.add('hidden');
+        $('taskInputArea')?.classList.add('hidden');
+        $('collabTaskList').innerHTML = "";
+    };
+}
+
+
+
 // snackbar helpers: show success/error messages or undo option
 function showSnackbar(message) {
     const snackbar = document.getElementById('snackbar');
@@ -249,8 +324,18 @@ function showSnackbarWithUndo(message) {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addBtn').addEventListener('click', addTask);
     document.getElementById('sortSelect').addEventListener('change', fetchTasks);
+
+    // ⭐ FIXED: Go to collaborative lists
+    const collabBtn = document.getElementById('goToCollabBtn');
+    if (collabBtn) {
+        collabBtn.addEventListener('click', () => {
+            window.location.href = "/collab";
+        });
+    }
+
     fetchTasks();
 });
+
 
 // --- ACCOUNT BUTTON ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -261,3 +346,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+

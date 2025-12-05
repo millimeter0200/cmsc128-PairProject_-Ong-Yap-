@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <script>
+  window.onpageshow = function(event) {
+      if (event.persisted) {
+          window.location.reload(); // prevent back-button cached page
+      }
+  };
+  </script>
+
   <meta charset="utf-8" />
   <title>Accounts — My To-Do List</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -8,8 +20,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-
-    
     body {
       font-family: "Poppins", sans-serif;
       margin: 0;
@@ -22,15 +32,15 @@
       background: url("{{ url_for('static', filename='account.png') }}") no-repeat center center fixed;
       background-size: cover;
       color: #000;
-      padding-top: 44px;
+      padding-top: 60px;
     }
 
     .container {
       position: fixed;
       background: rgba(255, 255, 255, 0.95);
       border-radius: 16px;
-      padding: 12px;
-      width: 474px;
+      padding: 24px;
+      width: 500px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.08);
       text-align: center;
       margin-top: 128px;
@@ -38,14 +48,13 @@
     }
 
     .profile-pic {
-      width: 120px;
-      height: 120px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       background: #eee url("https://cdn-icons-png.flaticon.com/512/847/847969.png") center/cover no-repeat;
-      margin: 10 auto 2px;
+      margin: 0 auto 16px;
       margin-left: 20px;
-      margin-top: 20px;
-   
+      margin-top: -10px;
     }
 
     .info {
@@ -54,7 +63,7 @@
       border-radius: 10px;
       text-align: left;
       margin-left: 150px;
-      margin-top: -130px;
+      margin-top: -115px;
     }
 
     .info p {
@@ -80,7 +89,6 @@
       font-weight: 600;
       cursor: pointer;
       transition: 0.2s;
-      
     }
     
     .btn:hover { transform: translateY(-2px); }
@@ -88,13 +96,13 @@
 
     #changePasswordFields input {
       display: block;
-      width: 80%;
+      width: 50%;
       padding: 8px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      margin-left: 45px;
+      margin-left: 20px;
       margin-top: 20px;
-      
+      margin-bottom: 12px;
     }
 
     .actions {
@@ -114,41 +122,6 @@
       margin-bottom: 12px;
       font-weight: 600;
     }
-
-    .profile-actions,
-.account-actions {
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
-  
-}
-
-
-.profile-actions .btn,
-.account-actions .btn {
-  width: 80%;
-  max-width: 260px;
-  padding: 12px 3;
-  margin: 3px 0;
-  font-size: 1rem;
-  align-items: center;
-  
-}
-
-
-#editProfileBtn,
-#changePasswordBtn {
-  background: linear-gradient(135deg, #edd5e5, #d1edf8, #c5d3ed);
-  color: #000;
-}
-
-/* Keep Logout plain */
-#logoutBtn {
-  background: transparent;
-  color: black;
-  border: 1px solid #bbb;
-}
   </style>
 </head>
 
@@ -160,8 +133,6 @@
     ◀ Back 
   </button>
 
-  <!-- Collaborative To-Do List -->
-  <button id="goToCollabBtn" class="btn">Collaborative To-Do List</button>
 
   <div class="container">
     <div id="topLoginAlert"></div>
@@ -231,15 +202,15 @@
         <button id="editProfileBtn" class="btn">Edit Profile</button>
         <button id="saveProfileBtn" class="btn hidden">Save</button>
         <button id="cancelEditBtn" class="btn hidden">Cancel</button>
-        <button id="changePasswordBtn" class="btn">Change Password</button>
+        <button id="changePwBtn" class="btn small">Change Password</button>
       </div>
 
-      <div id="changePasswordFields" class="hidden">
+      <!-- <div id="changePasswordFields" class="hidden">
         <input id="currentPassword" type="password" placeholder="Current password" />
         <input id="newPassword" type="password" placeholder="New password" />
         <button id="savePasswordBtn" class="btn">Save Password</button>
         <button id="cancelPasswordBtn" class="btn">Cancel</button>
-      </div>
+      </div> -->
     </div>
 
     <div class="actions account-actions">
@@ -259,5 +230,28 @@
         window.location.href = '/todo';
     });
   </script>
+  <!-- =======================
+      CHANGE PASSWORD POPUP
+  ======================= -->
+  <div id="changePasswordModal" class="modal hidden">
+      <div class="modal-content">
+          <h3>Change Password</h3>
+
+          <label>Current Password</label>
+          <input type="password" id="cp_current">
+
+          <label>New Password</label>
+          <input type="password" id="cp_new">
+
+          <div class="modal-actions">
+              <button id="modalSavePwBtn" class="btn">Save</button>
+              <button id="modalCancelPwBtn" class="btn danger">Cancel</button>
+          </div>
+      </div>
+  </div>
+
+
+
+
 </body>
 </html>

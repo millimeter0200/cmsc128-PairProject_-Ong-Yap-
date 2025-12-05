@@ -12,14 +12,19 @@ body {
     max-width: 1500px;
     padding: 30px;
     margin-left: -95px;
-    
+    margin-top: -110px;
 }
 
 h1 {
     position: relative;
-    top: 65px; /* moves only the text down */
+    top: 120px; /* moves only the text down */
     margin-bottom: 20px; /* spacing below heading */
     margin-left: 650px;
+    width: fit-content; /* prevents it from stretching across entire page */
+    display: inline-block;
+    margin-bottom: 20px;
+    /* z-index: 1; */
+
 
 }
 
@@ -85,6 +90,7 @@ li {
     border-radius: 15px;
     margin-bottom: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-top: 20px;
 }
 
 li.done {
@@ -185,7 +191,6 @@ li.done {
 }
 
 .account-actions .btn:hover {
- background-color: #484848;
 }
 
 /* Layout for horizontal alignment */
@@ -334,6 +339,39 @@ body.login-page { color: #000 !important; }
   background: rgba(255,255,255,0.96) !important;
 }
 
+#loginUsername {
+    border-radius: 5px !important;
+    height: 30px;
+}
+
+#loginPassword {
+    border-radius: 5px !important;
+    height: 30px;
+}
+
+#loginBtn {
+    background-image: linear-gradient(135deg, #EDD5E5 0%, #D1EDF8 50%, #C5D3ED 100%) !important;
+    width: 100px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+
+#showRegisterLink{
+    color: rgb(246, 62, 135);
+}
+
+#showForgotLink{
+    color: rgb(246, 62, 135);
+}
+
+#logoutBtn {
+    margin-left: 150px;
+    color: rgb(246, 62, 135);
+    font-size: 15px;
+    font-style: bold;
+}
+
 /* Make top alert clearly visible */
 #topLoginAlert { background: rgba(255,230,230,0.96) !important; color: #7a0b0b !important; }
 
@@ -406,7 +444,7 @@ body.login-page { color: #000 !important; }
     flex-direction: column;
     gap: 15px;
     margin-left: 200px;
-    margin-top: 60px;
+    margin-top: 5px;
 }
 
 /* right column: task list */
@@ -458,7 +496,9 @@ body.login-page { color: #000 !important; }
     color: #333;               /* text color */
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-top: -1px;
+    margin-top: -5px;
+    margin-right: 20px;
+    height: 30px;
     z-index: 10; /* bring it above other elements */
 
 }
@@ -486,7 +526,7 @@ body.login-page { color: #000 !important; }
     justify-content: right; /* keeps it on the right */
     gap: 8px; /* space between label and select */
     margin-bottom: 10px;
-    margin-top: -10px;
+    margin-top: -60px;
 }
 
 /* Header actions container */
@@ -581,3 +621,64 @@ body.login-page { color: #000 !important; }
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
+
+#goToCollabBtn {
+    background: linear-gradient(135deg, #EDD5E5, #D1EDF8);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    border-color: none; 
+    color: black;
+    margin-left: 900px;
+    height: 40px;
+    margin-top: 50px;
+    /* z-index: 9999;
+    position: relative; */
+}
+
+/* for popup change password */
+/* Background overlay */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+}
+
+/* Hidden state */
+.modal.hidden {
+    display: none;
+}
+
+/* Popup box */
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    width: 350px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+

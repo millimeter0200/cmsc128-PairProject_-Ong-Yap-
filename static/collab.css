@@ -1,139 +1,719 @@
-/* GLOBAL */
-body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: url("background.jpg") center/cover no-repeat fixed;
+/* ===============================
+   GLOBAL LAYOUT & CONTAINER
+=============================== */
+
+/* .top-greeting {
+    position:absolute;
+    top:20px;
+    left:20px;
+    text-align:left;
+} */
+
+.container {
+    max-width: 1200px;
+    width: 1000px;
+    /* margin-left: 550px; */
+    /* margin: 110px auto 60px auto; */
+    padding: 40px;
+    /* background: rgba(255,255,255,0.92); */
+    border-radius: 20px;
+    /* box-shadow: 0 10px 28px rgba(0,0,0,0.08); */
+    position: relative;
 }
 
-/* PAGE WRAPPER */
-.page-wrapper {
-    min-height: 100vh;
+#gridListPanel {
+    position: relative;   /* allows safe shifting without affecting layout */
+    top: 30px;           /* move upward */
+    left: 630px;           /* move right */
+    /* OR right: 30px;  → move left */
+}
+
+
+.collab-greeting-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-left: -20px;
+    position: relative;
+}
+
+.collab-greeting-sub {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: rgba(0,0,0,0.75);
+    margin-left: -140px;
+}
+
+/* ===============================
+   PAGE HEADER
+=============================== */
+
+.page-header {
+    display: grid;
+    grid-template-columns: 180px 1fr 260px;
+    align-items:center;
+    margin-bottom: 25px;
+}
+
+.page-title {
+    text-align:center;
+    margin:0;
+}
+
+.create-list-row {
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+}
+
+.list-input {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+/* ===============================
+   WRAPPER — GRID → VERTICAL MODE
+=============================== */
+
+.tasks-wrapper {
+    display:flex;
+    gap:40px;
+    justify-content:center;
+    transition:0.35s ease;
+    /* background-image: url("background.jpg");
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.5s ease-in-out; */
+}
+
+/* ON LIST SELECT → becomes left sidebar + right tasks */
+.tasks-wrapper.as-vertical {
+    justify-content:flex-start;
+    margin-left: 350px;
+    margin-top: 155px;
+    width: 105%;
+    display: flex;
+    /* background-image: url("bg.jpg");
+    background-size: 1000px 600px;
+    background-position: center;
+    transition: background-image 0.5s ease-in-out; */
+}
+
+/* ===============================
+   LEFT PANEL
+=============================== */
+
+.tasks-left {
+    width:100%;
+    max-width:900px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    transition:0.35s ease;
+}
+
+/* shrink when vertical mode */
+.tasks-wrapper.as-vertical .tasks-left {
+    max-width:320px;
+}
+
+/* list box container */
+.list-panel {
+    /* background: linear-gradient(135deg, #EDD5E5, #D1EDF8); */
+    padding:20px;
+    border-radius:16px;
+    /* box-shadow:0 5px 18px rgba(0,0,0,0.08); */
+    width:100%;
+    transition:0.35s ease;
+}
+
+.list-panel h2 {
+    text-align:center;
+    margin-top:0;
+    margin-left: -100px;
+}
+
+/* ===============================
+   LIST CARDS (GRID MODE)
+=============================== */
+
+.lists-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap:18px;
+    margin-top: 20px;
+}
+
+.list-card {
+    background:#fff;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 8px 22px rgba(0,0,0,0.06);
+    cursor:pointer;
+    text-align:center;
+    transition:0.2s ease;
+}
+
+.list-card:hover {
+    transform:translateY(-6px);
+    box-shadow:0 14px 30px rgba(0,0,0,0.08);
+}
+
+.card-title {
+    font-weight:700;
+    font-size:1.1rem;
+}
+
+/* ===============================
+   LIST ITEMS (VERTICAL MODE)
+=============================== */
+
+/* Correct target for vertical list */
+#collabLists,
+.lists-box {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+    max-height: 50vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    margin-left: -50px;
+}
+
+
+
+.list-item {
+    background:#fff;
+    padding:14px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-radius:12px;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(0,0,0,0.06);
+    transition:0.15s ease;
+}
+
+.list-item:hover {
+    transform:translateY(-3px);
+}
+
+/* Pink highlight (S2) */
+.list-item.selected {
+    background: linear-gradient(90deg, #FFEAF0, #FFF5FC);
+    border-left:5px solid #ff97c0;
+    transform:translateX(4px);
+}
+
+.list-left {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+}
+
+.list-name {
+    font-weight:600;
+    max-width:200px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.list-actions-inline {
+    display:flex;
+    gap:6px;
+}
+
+/* ===============================
+   RIGHT PANEL (TASK COLUMN)
+=============================== */
+
+.tasks-right {
+    flex:1;
+    opacity:0;
+    transform:translateX(30px);
+    pointer-events:none;
+    transition:0.35s ease;
+    height: calc(100vh - 200px); /* adjust depending on your header size */
+    /* overflow-x: visible;
+    overflow-y: hidden;   */
+    padding-right: 10px; /* avoid scrollbar covering content */
+    margin-top: -100px;
+    max-height: none;       /* allow full height */
+    overflow: visible;
+}
+
+.tasks-right.visible {
+    opacity:1;
+    transform:translateX(0px);
+    pointer-events:auto;
+}
+
+/* ===============================
+   LIST TITLE
+=============================== */
+
+.list-title-box {
+    margin-bottom:20px;
+    margin-top: 100px;
+}
+
+#currentListTitle {
+    font-size:1.8rem;
+    font-weight:700;
+    margin-bottom: 30px;
+    margin-top: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+#openTaskPopupBtn {
+    margin-right: -150px;
+    margin-top: -50px;
+    height: 30px;
+}
+/* ===============================
+   COLLABORATOR PANEL
+=============================== */
+
+.collab-tools {
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid rgba(0,0,0,0.15);
+}
+
+.collab-label {
+    font-weight:600;
+}
+
+.collab-input-row {
+    display:flex;
+    gap:10px;
+    margin-top:8px;
+}
+
+.collab-input {
+    flex:1;
+    padding:8px 10px;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+
+.collab-tags {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
+
+.collab-tag {
+    background:#fff;
+    padding:6px 12px;
+    border-radius:100px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.collab-tag .remove {
+    cursor:pointer;
+    color:#d6457b;
+    font-size:1rem;
+}
+
+/* ===============================
+   SORT OPTIONS
+=============================== */
+
+.sort-options {
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:12px;
+}
+
+/* ===============================
+   TASK INPUT (matches personal UI)
+=============================== */
+
+.task-input-panel {
+    background:#fff;
+    padding:20px;
+    border-radius:16px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom:14px;
+}
+
+.task-input-panel input,
+.task-input-panel select {
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+
+/* ===============================
+   TASK LIST — IDENTICAL TO INDEX
+=============================== */
+
+#collabTaskList {
+    list-style:none;
+    padding:0;
+    margin:0;
+    margin-top: -50px;
+    max-height: calc(100vh - 330px); 
+    padding-right: 10px;
+    scrollbar-width: thin;
+    overflow-x: visible; 
+    overflow-y: auto;
+    max-width: 110%;
+}
+
+#collabTaskList li {
+    background:#fff;
+    padding:14px 16px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    margin-bottom:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    transition:0.15s ease;
+    width: 95%;
+    height: fit-content;
+    overflow-x: visible; 
+    overflow-y: hidden;  
+}
+
+#collabTaskList li:hover {
+    transform:translateY(-4px);
+    box-shadow:0 14px 28px rgba(0,0,0,0.09);
+}
+
+.task-info {
+    display:flex;
+    flex-direction:column;
+}
+
+/* Priority tags */
+.p-High {
+    background:#FADADD; color:#8B2F2F;
+    padding:4px 10px; border-radius:12px; font-weight:600;
+}
+.p-Mid {
+    background:#FFF4CC; color:#7A5A10;
+    padding:4px 10px; border-radius:12px; font-weight:600;
+}
+.p-Low {
+    background:#E8F9EA; color:#216A2A;
+    padding:4px 10px; border-radius:12px; font-weight:600;
+}
+
+.done { opacity:0.6; text-decoration:line-through; }
+
+/* Action buttons */
+.task-buttons {
+    display:flex;
+    gap:10px;
+}
+.task-buttons button {
+    background:none;
+    border:none;
+    font-size:1.1rem;
+    cursor:pointer;
+}
+.task-buttons button:hover {
+    color:#d6457b;
+}
+
+/* ===============================
+   BUTTONS (MATCH INDEX)
+=============================== */
+
+.btn {
+    background-image:linear-gradient(135deg, #EDD5E5, #D1EDF8);
+    padding:10px 16px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    font-weight:600;
+    transition:0.2s;
+    
+}
+
+.btn:hover { transform:translateY(-3px); }
+
+.btn.small { font-size:0.85rem; padding:8px 12px; }
+.btn.tiny { font-size:0.75rem; padding:6px 10px; }
+.btn.danger { background:#ffb4c8; }
+.btn.danger:hover { background:#ff8aa8; }
+
+#backToPersonalBtn {
+    margin-top: -250px;
+    margin-left: 160px;
+    margin-bottom: -350px;
+    width: 200px;
+    z-index: 99999 !important;
+}
+
+
+/* ===============================
+   HIDDEN
+=============================== */
+
+.hidden { display:none !important; }
+
+/* Ensure predictable 3-column layout
+.tasks-wrapper {
+    display: grid;
+    grid-template-columns: 320px 1fr 1fr;
+    gap: 40px;
+}
+
+/* When no list selected → center the grid */
+/* .tasks-wrapper:not(.as-vertical) {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
+.tasks-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+} */
+
+/* Ensure tasks-right takes center column */
+/* .tasks-right {
+    grid-column: 2;
+} */ */
+
+/* Fix layout: 3-column only when a list is selected */
+.tasks-wrapper {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 40px;
+    align-items: start; /* IMPORTANT: keeps task list aligned to top */
+}
+
+
+/* Before selecting a list → center grid */
+.tasks-wrapper:not(.as-vertical) {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    margin-top: -20px;
+
+}
+
+.tasks-left {
+    grid-column: 1;
+    margin-left: -130px;
+}
+
+.tasks-right {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.tasks-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.inline-collab-input {
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-left: 10px;
+    width: 140px;
+}
+
+.list-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* inline edit form styles for task list */
+.inline-edit-form { padding: 10px 12px; background: #fff; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+li.editing { background: transparent !important; }
+.inline-edit-form input, .inline-edit-form select { font-size: 0.95rem; }
+
+/* Popup Background */
+.task-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2000;
 }
 
-/* MAIN CARD */
-.collab-card {
-    background: rgba(255,255,255,0.93);
+/* Hidden state */
+.task-modal.hidden {
+    display: none;
+}
+
+/* Popup Box */
+.task-modal-content {
+    background: transparent;  /* your card styling remains untouched */
+    border-radius: 16px;
+    padding: 0;
+    width: auto;
+}
+
+/* Keep your existing task-input-panel styling */
+#taskInputArea {
+    width: 400px;   /* you can keep your existing width */
+}
+
+#newDueDate {
     width: 95%;
-    max-width: 1050px;
-    padding: 25px;
-    border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
 }
 
-/* HEADER BAR */
-.collab-header {
+#newDueTime {
+    width: 95%;
+}
+
+#newTask {
+    width: 95%;
+}
+
+body.collab-bg-default {
+    background-image: url("background.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    margin: 0;
+}
+
+body.collab-bg-active {
+    background-image: url("bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.lists-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+    margin-top: 100px;
 }
 
-/* ALERT */
-.alert {
-    text-align: center;
-    font-weight: 600;
-    min-height: 24px;
+.lists-header-row h2 {
+    margin: 0;
 }
 
-/* TOP CONTROLS */
-.top-controls {
+.create-list-row {
     display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 10px;
 }
 
-.control-box {
-    background: #f3f4f6;
-    flex: 1;
-    padding: 15px;
-    border-radius: 12px;
+.create-list-row .list-input {
+    width: 200px;
 }
 
-.control-box h3 {
-    margin-top: 0;
-}
-
-/* MAIN BODY */
-.main-area {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 25px;
-}
-
-/* PANELS */
-.lists-panel,
-.tasks-panel {
-    background: #fff;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-/* LISTS */
-.list-box div {
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: 1px solid #ddd;
-    margin-bottom: 6px;
-}
-
-.list-box div:hover {
-    background: #f1f5ff;
-}
-
-.list-box div.selected {
-    background: #dbeafe;
-    border-color: #2563eb;
-}
-
-/* TASK DISPLAY */
-.task-box div {
-    padding: 8px;
-    margin-bottom: 6px;
-    border-radius: 6px;
-    background: #f9fafb;
-}
-
-/* TASK INPUT */
-.task-input {
+.title-row {
     display: flex;
-    margin-top: 10px;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
 }
 
-/* INPUTS */
-input, select {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid #bbb;
-    margin-bottom: 6px;
+.list-actions {
+    display: flex;
+    align-items: center;
+    gap: 220px; /* spacing between Add Task and collab inputs */
+    margin-left: -150px;
+    margin-top: 100px;
 }
 
-/* BUTTONS *//* BUTTON STYLE MATCHING MAIN APP (PASTEL GRADIENT) */
-.btn {
-    background: linear-gradient(135deg, #edd5e5, #d1edf8, #c5d3ed);
-    border: none;
+.collab-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* spacing between input and Add button */
+}
+
+#inlineCollabInput {
+    width: 180px;
     border-radius: 10px;
-    padding: 9px 16px;
-    font-weight: 600;
+    margin-top: -20px;
+    height: 27px;
+}
+
+#inlineAddCollabBtn {
+    background: #ffa6e1;
+    /* padding: 8px 10px; */
+    border-radius: 10px;
+    font-weight: bold;
+    margin-top: -20px;
+}
+
+#listHeader {
+    width: 100%;
+    margin-bottom: 20px;
+    margin-top: -50px;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    /* align-items: center; */
+    width: 100%;
+    margin-top: 250px;
+    margin-left: -140px;
+}
+
+.sortBar {
+    display: flex;
+    gap: 8px;
+    font-size: 17px;
+
+}
+
+.add-circle-btn {
+    width: 60px;
+    height: 60px;
+    border: none;
+    background: none;
+    padding: 0;
     cursor: pointer;
-    color: #000;
-    transition: 0.25s ease;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.15s ease;
 }
 
-.btn:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.05);
+.add-circle-btn img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
 }
 
-.btn:active {
-    transform: translateY(0);
+.add-circle-btn:hover {
+    transform: scale(1.08);
+}
+
+#userGreeting {
+    position: absolute;
+    pointer-events: none;  /* ensures NOTHING under it gets blocked */
+    margin-left: -30px;
+}
+
+#userGreeting, 
+#userGreeting * {
+    pointer-events: none !important;
 }

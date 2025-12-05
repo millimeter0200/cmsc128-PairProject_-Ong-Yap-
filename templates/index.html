@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <script>
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            window.location.reload(); // prevent back-button cached page
+        }
+    };
+    </script>
+
     <meta charset="UTF-8">
     <title>To-Do List</title>
     <!-- Google Fonts -->
@@ -11,9 +23,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div id="userGreeting" style="position: absolute; top: 20px; left: 20px; text-align: left;">
-        <div id="greetName" style="font-weight: 700; font-size: 1.2rem;">Hello!</div>
-        <div id="greetDate" style="font-size: 0.95rem; color: rgba(0,0,0,0.7);"></div>
+    <div id="userGreeting" 
+        style="position:absolute; top:20px; left:20px; text-align:left; pointer-events:none;">
+        <div id="greetName" style="font-weight:700; font-size:1.2rem;">Hello!</div>
+        <div id="greetDate" style="font-size:0.95rem; color:rgba(0,0,0,0.7);"></div>
     </div>
 
     <div class="header-actions">
@@ -23,50 +36,58 @@
     </div>
 
     <div class="container">
-        <h1>My To-Do List</h1>
+    <h1>My To-Do List</h1>
 
-        <div class="tasks-wrapper">
-            <!-- Left column: add task -->
-            <div class="tasks-left">
-                <div class="add-task-container">
-                    <div class="new-todo-label">New To-Do</div>
+    <!-- Collaborative To-Do List button (correct position) -->
+    <button id="goToCollabBtn" class="btn" 
+            onclick="location.href='/collab'">
+        Collaborative To-Do List
+    </button>
 
-                    <div class="task-form">
-                        <label for="taskInput">Enter task</label>
-                        <input type="text" id="taskInput" placeholder="Type your task here">
+    <div class="tasks-wrapper">
+        <!-- Left column: Add task -->
+        <div class="tasks-left">
+            <div class="add-task-container">
+                <div class="new-todo-label">New To-Do</div>
 
-                        <label for="dueDateInput">Choose a date</label>
-                        <input type="date" id="dueDateInput">
+                <div class="task-form">
+                    <label for="taskInput">Enter task</label>
+                    <input type="text" id="taskInput" placeholder="Type your task here">
 
-                        <label for="dueTimeInput">Choose time</label>
-                        <input type="time" id="dueTimeInput">
+                    <label for="dueDateInput">Choose a date</label>
+                    <input type="date" id="dueDateInput">
 
-                        <label for="priorityInput">Set level of priority</label>
-                        <select id="priorityInput">
-                            <option value="High">High</option>
-                            <option value="Mid" selected>Mid</option>
-                            <option value="Low">Low</option>
-                        </select>
-                        <button id="addBtn"><i class="fas fa-plus"></i> Add Task</button>
-                    </div>
-                </div>
-            </div>
+                    <label for="dueTimeInput">Choose time</label>
+                    <input type="time" id="dueTimeInput">
 
-            <!-- Right column: task list + sort -->
-            <div class="tasks-right">
-                <div class="sort-options">
-                    <label for="sortSelect">Sort by:</label>
-                    <select id="sortSelect">
-                        <option value="added">Date Added</option>
-                        <option value="due">Due Date</option>
-                        <option value="priority">Priority</option>
+                    <label for="priorityInput">Set level of priority</label>
+                    <select id="priorityInput">
+                        <option value="High">High</option>
+                        <option value="Mid" selected>Mid</option>
+                        <option value="Low">Low</option>
                     </select>
-                </div>
 
-                <ul id="taskList"></ul>
+                    <button id="addBtn"><i class="fas fa-plus"></i> Add Task</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column: task list -->
+        <div class="tasks-right">
+            <div class="sort-options">
+                <label for="sortSelect">Sort by:</label>
+                <select id="sortSelect">
+                    <option value="added">Date Added</option>
+                    <option value="due">Due Date</option>
+                    <option value="priority">Priority</option>
+                </select>
             </div>
 
+            <ul id="taskList"></ul>
         </div>
+    </div>
+</div>
+    
 
 
 

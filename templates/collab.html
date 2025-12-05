@@ -1,79 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Collaborative To-Do Lists</title>
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='collab.css') }}">
+    <script>
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            window.location.reload(); // prevent back-button cached page
+        }
+    };
+    </script>
 
-<style>
-.hidden { display: none; }
-</style>
+    <meta charset="UTF-8">
+    <title>Collaborative To-Do Lists</title>
+
+    <!-- Fonts + Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Global style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Collab overrides -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='collab.css') }}">
 </head>
 
 <body>
 
-<div class="page-wrapper">
+    <!-- =======================
+         ENTER TASK POPUP
+    ======================== -->
+    <div id="taskModal" class="task-modal hidden">
+        <div class="task-modal-content">
+            <div id="taskInputArea" class="task-input-panel">
+                <label>Enter task</label>
+                <input type="text" id="newTask" placeholder="Type your task here">
 
-  <div class="collab-card">
+                <label>Choose a date</label>
+                <input type="date" id="newDueDate">
 
-    <!-- HEADER -->
-    <div class="collab-header">
-      <h1>Collaborative To-Do Lists</h1>
-      <button id="backToPersonalBtn" class="btn back-btn">Back</button>
+                <label>Choose time</label>
+                <input type="time" id="newDueTime">
+
+                <label>Set level of priority</label>
+                <select id="newPriority">
+                    <option value="High">High</option>
+                    <option value="Mid" selected>Mid</option>
+                    <option value="Low">Low</option>
+                </select>
+
+                <div class="task-modal-actions">
+                    <button id="addTaskBtn" class="btn small">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+
+                    <button id="closeTaskModal" class="btn danger small">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- ALERT -->
-    <div id="collabAlert" class="alert"></div>
 
-    <!-- TOP FORMS -->
-    <div class="top-controls">
+    <!-- =======================
+         EDIT TASK MODAL
+    ======================== -->
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Edit Task</h3>
 
-      <div class="control-box">
-        <h3>Create List</h3>
-        <input id="collabName" placeholder="New list name">
-        <button id="createCollabBtn" class="btn primary">Create</button>
-      </div>
+            <label>Task name</label>
+            <input type="text" id="editTitle">
 
-      <div class="control-box">
-        <h3>Invite Collaborator</h3>
-        <select id="collabUserSelect"></select>
-        <button id="addCollabBtn" class="btn primary">Add</button>
-      </div>
+            <label>Due date</label>
+            <input type="date" id="editDueDate">
 
+            <label>Due time</label>
+            <input type="time" id="editDueTime">
+
+            <label>Priority</label>
+            <select id="editPriority">
+                <option value="High">High</option>
+                <option value="Mid">Mid</option>
+                <option value="Low">Low</option>
+            </select>
+
+            <div class="modal-actions">
+                <button id="saveEditBtn" class="btn">Save</button>
+                <button id="cancelEditBtn" class="btn danger">Cancel</button>
+            </div>
+        </div>
     </div>
 
-    <!-- MAIN BODY -->
-    <div class="main-area">
 
-      <!-- LEFT -->
-      <div class="lists-panel">
-        <h3>Your Lists</h3>
-        <div id="collabLists" class="list-box"></div>
-      </div>
-
-      <!-- RIGHT -->
-      <div class="tasks-panel">
-
-        <h3 id="currentListTitle">Select a list</h3>
-
-        <div id="collabTasks" class="task-box"></div>
-
-        <div id="taskInputArea" class="task-input hidden">
-          <input id="newTask" placeholder="Enter a task">
-          <button id="addTaskBtn" class="btn success">Add</button>
+    <!-- =======================
+         GREETING + ADD TASK BTN
+    ======================== -->
+    <div id="userGreeting" class="top-greeting">
+        <div id="greetName" class="collab-greeting-title">
+            Hello! <br> 
+            <span class="collab-greeting-sub">Welcome to your Collaborative To-Do List</span>
         </div>
 
-      </div>
-
+        <!-- Opens the popup -->
+        <!-- <button id="openTaskPopupBtn" class="btn small">+ Add Task</button> -->
     </div>
 
-  </div>
+    <!-- Accounts Button -->
+    <div class="header-actions">
+        <a href="/accounts" id="accountsLink" class="button">
+            <i class="fa fa-user"></i> Accounts
+        </a>
+    </div>
 
-</div>
 
-<script src="{{ url_for('static', filename='collab.js') }}"></script>
+    <!-- =======================
+         PAGE CONTENT
+    ======================== -->
+    <div class="container">
 
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <button id="backToPersonalBtn" class="btn small">
+                <i class="fas fa-arrow-left"></i> Back to Personal Tasks
+            </button>
+
+        </div>
+
+
+        <!-- =======================
+             TWO-COLUMN WRAPPER
+        ======================== -->
+        <div id="tasksWrapper" class="tasks-wrapper">
+
+            <!-- LEFT COLUMN -->
+            <div class="tasks-left">
+
+                <!-- GRID LIST PANEL (before selecting a list) -->
+                <div id="gridListPanel" class="list-panel">
+
+                    <div class="lists-header-row">
+                        <h2>Your Lists</h2>
+
+                        <div class="create-list-row">
+                            <input id="collabName" class="list-input" placeholder="New list name">
+                            <button id="createCollabBtn" class="btn small">
+                                <i class="fas fa-plus"></i> Create
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="listsGrid" class="lists-grid"></div>
+
+                </div>
+
+
+                <!-- SIDEBAR LIST PANEL (after selecting a list) -->
+                <div id="verticalListPanel" class="list-panel hidden">
+                    <h2>Your Lists</h2>
+                    <div id="collabLists" class="lists-box"></div>
+                </div>
+
+                <!-- Required by JS → collaborator list container -->
+                <div id="collabMemberSection" class="hidden">
+                    <div id="collabMemberList" class="hidden"></div>
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT COLUMN -->
+            <div class="tasks-right" id="tasksRight">
+
+                <!-- List Header -->
+                <div id="listHeader" class="list-title-box hidden">
+                    <div class="title-row">
+                        <h2 id="currentListTitle"></h2>
+                        
+                        <div class="header-row">
+                            <div id="sortBar" class="sort-options hidden">
+                                <label>Sort by:</label>
+                                <select id="sortSelect">
+                                    <option value="added">Date Added</option>
+                                    <option value="due">Due Date</option>
+                                    <option value="priority">Priority</option>
+                                </select>
+                            </div>
+                            <button id="openTaskPopupBtn" class="add-circle-btn">
+                                <img src="/static/button.png" alt="Add Task">
+                        </div>
+
+                        <div class="list-actions">
+                            
+                            <!-- <button id="renameListBtn" class="btn tiny">Rename</button>
+                            <button id="deleteListBtn" class="btn tiny danger">Delete</button> -->
+
+                            <div class="collab-input-group">
+                                <input id="inlineCollabInput" placeholder="Username" class="inline-collab-input">
+                                <button id="inlineAddCollabBtn" class="btn tiny">Add Collaborator</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sorting -->
+                
+
+                <!-- Task List -->
+                <ul id="collabTaskList"></ul>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="snackbar"></div>
+
+    <script src="{{ url_for('static', filename='collab.js') }}"></script>
 </body>
 </html>
